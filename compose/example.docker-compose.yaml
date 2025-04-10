@@ -1,0 +1,12 @@
+services:
+  engine:
+    image: ghcr.io/hugr-lab/automigrate:latest
+    container_name: hugr
+    ports:
+      - "15000:15000"
+    volumes:
+      - ../:/data
+    environment:
+      BIND: :15000
+      DEBUG: true
+      CORE_DB_PATH: /data/.local/docker.duckdb

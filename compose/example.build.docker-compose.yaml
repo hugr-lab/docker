@@ -1,0 +1,14 @@
+services:
+  engine:
+    build:
+      context: ..
+      dockerfile: automigrate.dockerfile
+    container_name: hugr-service
+    ports:
+      - "15000:15000"
+    volumes:
+      - ../:/data
+    environment:
+      BIND: :15000
+      DEBUG: true
+      CORE_DB_PATH: /data/.local/docker.duckdb
