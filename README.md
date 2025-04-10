@@ -50,8 +50,15 @@ docker pull ghcr.io/hugr-lab/automigrate:latest
 You can also save and load the images to/from a tar file using the following commands:
 
 ```bash
-docker save -o hugr-server.tar ghcr.io/hugr-lab/server:latest
+docker pull ghcr.io/hugr-lab/server:latest --platform linux/amd64 
+docker save -o hugr-server.tar ghcr.io/hugr-lab/server:latest --platform linux/amd64
 docker load -i hugr-server.tar
+```
+
+```bash
+docker pull ghcr.io/hugr-lab/automigrate:latest --platform linux/amd64 
+docker save -o hugr-automigrate.tar ghcr.io/hugr-lab/automigrate:latest --platform linux/amd64
+docker load -i hugr-automigrate.tar
 ```
 
 ## Contributing
