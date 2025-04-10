@@ -33,7 +33,10 @@ jobs:
         with:
           context: .
           file: linux.dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            HUGR_VERSION=${{ github.ref_name }}
           tags: |
             ghcr.io/server:${{ github.ref_name }}
             ghcr.io/server:latest
@@ -43,7 +46,10 @@ jobs:
         with:
           context: .
           file: automigrate.dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            HUGR_VERSION=${{ github.ref_name }}
           tags: |
             ghcr.io/automigrate:${{ github.ref_name }}
             ghcr.io/automigrate:latest
