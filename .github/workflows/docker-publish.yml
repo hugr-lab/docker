@@ -38,8 +38,8 @@ jobs:
           build-args: |
             HUGR_VERSION=${{ github.ref_name }}
           tags: |
-            ghcr.io/server:${{ github.ref_name }}
-            ghcr.io/server:latest
+            ghcr.io/hugr-lab/server:${{ github.ref_name }}
+            ghcr.io/hugr-lab/server:latest
             
       - name: Build and push automigrate image
         uses: docker/build-push-action@v5
@@ -51,5 +51,5 @@ jobs:
           build-args: |
             HUGR_VERSION=${{ github.ref_name }}
           tags: |
-            ghcr.io/automigrate:${{ github.ref_name }}
-            ghcr.io/automigrate:latest
+            ghcr.io/hugr-lab/automigrate:${{ github.ref_name }}
+            ghcr.io/hugr-lab/automigrate:latest

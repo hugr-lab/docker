@@ -13,7 +13,7 @@ WORKDIR /app/hugr
 RUN go get github.com/marcboeker/go-duckdb/v2
 RUN go mod download
 
-RUN cd cmd/qe-server && \
+RUN cd cmd/server && \
     CGO_ENABLED=1 go build -tags='duckdb_arrow' -o /hugr-server .
 
 RUN cd cmd/migrate && \
