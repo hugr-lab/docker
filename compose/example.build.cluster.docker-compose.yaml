@@ -1,0 +1,199 @@
+services:
+  # memcached
+  memcached:
+    image: memcached:latest
+    container_name: memcached
+    ports:
+      - "11211"
+    volumes:
+      - ../.local/mc-cache:/data
+    environment:
+      MEMCACHED_MEMORY_LIMIT: 1024m
+      MEMCACHED_MAX_CONNECTIONS: 10
+      MEMCACHED_PORT: 11211
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11211"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 1s
+
+  # Redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379"
+    volumes:
+      - ../.local/redis-cache:/data
+    environment:
+      REDIS_PASSWORD: test
+      REDIS_PORT: 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 1s
+
+  storage:
+    image: minio/minio:latest
+    container_name: storage
+    ports:
+      - "16000:9000"
+      - "16001:9001"
+    volumes:
+      - ../.local/s3/:/data
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+      
+    command: server --console-address ":9001" /data
+
+
+  # PostgreSQL as core db for hugr
+  core-db:
+    image: postgres:latest
+    container_name: hugr-core-db
+    ports:
+      - "5432"
+    volumes:
+      - ../.local/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: hugr
+      POSTGRES_PASSWORD: hugr
+      POSTGRES_DB: hugr
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hugr"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 1s
+
+  # Hugr
+  management:
+    build:
+      context: ..
+      dockerfile: management.dockerfile
+    container_name: hugr-management
+    depends_on:
+      core-db:
+        condition: service_healthy
+    environment:
+      BIND: :14000
+      SERVICE_BIND: :13000
+      DEBUG: true
+      CORE_DB_PATH: postgres://hugr:hugr@core-db:5432/hugr-core
+      ALLOWED_ANONYMOUS: true
+      ANONYMOUS_ROLE: "admin"
+      ADMIN_UI: true
+      SECRET: 'cluster-secret'
+      TIMEOUT: 30s
+      CHECK: 1m
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:13000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  node1:
+    build:
+      context: ..
+      dockerfile: server.dockerfile
+    container_name: hugr-node-1
+    depends_on:
+      redis:
+        condition: service_healthy
+      management:
+        condition: service_healthy
+      core-db:
+        condition: service_healthy
+#      memcached:
+#        condition: service_healthy
+    ports:
+      - "15001:15001"
+    volumes:
+      - ../../:/data
+    environment:
+      BIND: :15001
+      SERVICE_BIND: :13000
+      CLUSTER_SECRET: 'cluster-secret'
+      CLUSTER_MANAGEMENT_URL: http://management:14000
+      CLUSTER_NODE_NAME: node1
+      CLUSTER_NODE_URL: http://node1:15001/ipc
+      CLUSTER_TIMEOUT: 30s
+      CACHE_TTL: 15m
+      CACHE_L1_ENABLED: true
+      CACHE_L1_MAX_SIZE: 10000
+      CACHE_L1_CLEAN_TIME: 2m
+      CACHE_L1_EVICTION_TIME: 5m
+      CACHE_L2_ENABLED: true
+      CACHE_L2_BACKEND: 'redis'
+      CACHE_L2_ADDRESSES: 'redis:6379'
+      #CACHE_L2_BACKEND='memcached'
+      #CACHE_L2_ADDRESSES='memcached:11211'
+      CACHE_L2_PASSWORD: 'test'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:13000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  node2:
+    build:
+      context: ..
+      dockerfile: server.dockerfile
+    container_name: hugr-node-2
+    depends_on:
+      redis:
+        condition: service_healthy
+      management:
+        condition: service_healthy
+      core-db:
+        condition: service_healthy
+#      memcached:
+#        condition: service_healthy
+    ports:
+      - "15002:15002"
+    volumes:
+      - ../../:/data
+    environment:
+      BIND: :15002
+      SERVICE_BIND: :13000
+      CLUSTER_SECRET: 'cluster-secret'
+      CLUSTER_MANAGEMENT_URL: http://management:14000
+      CLUSTER_NODE_NAME: node2
+      CLUSTER_NODE_URL: http://node2:15002/ipc
+      CLUSTER_TIMEOUT: 30s
+      CACHE_TTL: 15m
+      CACHE_L1_ENABLED: true
+      CACHE_L1_MAX_SIZE: 10000
+      CACHE_L1_CLEAN_TIME: 2m
+      CACHE_L1_EVICTION_TIME: 5m
+      CACHE_L2_ENABLED: true
+      CACHE_L2_BACKEND: 'redis'
+      CACHE_L2_ADDRESSES: 'redis:6379'
+      #CACHE_L2_BACKEND='memcached'
+      #CACHE_L2_ADDRESSES='memcached:11211'
+      CACHE_L2_PASSWORD: 'test'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:13000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  nginx:
+    image: nginx:alpine
+    container_name: hugr-nginx
+    ports:
+      - "15000:15000"
+    volumes:
+      - ./example.cluster.nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      node1:
+        condition: service_healthy
+      node2:
+        condition: service_healthy

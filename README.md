@@ -30,7 +30,7 @@ cd compose
 docker compose -f example.docker-compose.yml up
 ```
 
-This will start the server and the database. The server will be available at http://localhost:15000 with core db, that is placed in .local directory, and it should be exists, before server is started. To set up other settings use environment variables see [Hugr repo](https://github.com/hugr-lab/hugr/README.md).
+This will start the server and the database. The server will be available at ```http://localhost:15000``` with core db, that is placed in .local directory, and it should be exists, before server is started. To set up other settings use environment variables see [Hugr repo](https://github.com/hugr-lab/hugr/README.md).
 
 There is an example of docker-compose file that describes Hugr, cache and s3 (minio) services. To run the example, you can use the following command:
 
