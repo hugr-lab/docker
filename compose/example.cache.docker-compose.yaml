@@ -41,12 +41,14 @@ services:
     container_name: s3
     ports:
       - "16000:9000"
+      - "16001:9001"
     volumes:
       - ../.local/s3/:/data
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
-    command: server /data
+      
+    command: server --console-address ":9001" /data
 
   # Hugr
   hugr:
