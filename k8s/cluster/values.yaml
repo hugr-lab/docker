@@ -1,0 +1,130 @@
+ingress:
+  enabled: true
+  host: "hugr-cluster.local"
+
+management:
+  image:
+    repository: ghcr.io/hugr-lab/management
+    tag: v0.1.10
+    pullPolicy: IfNotPresent
+
+  service:
+    bind: ":14000"
+    serviceBind: ":13000"
+  
+  cluster:
+    secret: "cluster-secret"
+    timeout: "30s"
+    checkInterval: "1m"
+  
+  oidc:
+    issuer: ""
+    clientID: ""
+    timeout: ""
+    cookieName: ""
+    scopeRolePrefix: ""
+    claims:
+      userId: ""
+      userName: ""
+      role: ""
+  
+  workNode:
+    adminUI: true
+    adminFetchPath: "/admin"
+    debug: true
+    coreDBName: "hugr-core"
+    coreDBPath: ""
+    cors:
+      allowedOrigins: ""
+      allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
+      allowedHeaders: "Authorization, Content-Type, Accept"
+    auth:
+      managedApiKeys: true
+      allowedAnonymous: true
+      anonymousRole: "admin"
+      configFile: ""
+    
+workNode:
+  image:
+    repository: ghcr.io/hugr-lab/server
+    tag: v0.1.10
+    pullPolicy: IfNotPresent
+  
+  replicas: 3
+
+  shared:
+    size: "1Gi"
+    mountPath: "/data"
+    hostPath: "/data"
+
+  service:
+    bind: ":15000"
+    serviceBind: ":13000"
+
+  allowParallel: true
+  maxParallelQueries: 10
+  maxDepthInTypes: 7
+  
+  dbHome:
+    mountPath: /db-home
+    storage: 1Gi
+    storageClass: "standard"
+
+  db:
+    path: ""
+    maxOpenConns: 100
+    maxIdleConns: 100
+    settings:
+      allowedDirectories: ""
+      allowedPaths: ""
+      enableLogging: ""
+      maxMemory: ""
+      maxTempDirectorySize: ""
+      tempDirectory: ""
+      workerThreads: ""
+      pgConnectionLimit: 64
+      pgPagesPerTask: ""
+
+  cache:
+    ttl: "15m"
+    l1:
+      enabled: true
+      maxSize: 1000000
+      maxItemSize: 1000000
+      shards: 4
+      cleanTime: "1m"
+      evictionTime: "5m"
+    l2:
+      enabled: true
+      backend: "redis"
+      addresses: ""
+      database: 0
+      username: ""
+      password: ""
+
+postgresql:
+  enabled: true
+  fullnameOverride: "coredb"
+  auth:
+    postgresPassword: "hugrPass"
+  service:
+    type: ClusterIP
+    port: 5432
+  persistence:
+    enabled: true
+
+cache:
+  enabled: true
+  fullnameOverride: redis
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+  redis:
+    port: 6379
+  
+
+prometheus:
+  enabled: false

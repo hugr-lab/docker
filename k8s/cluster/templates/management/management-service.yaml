@@ -1,0 +1,18 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: management-node
+  labels:
+    app: management-node
+spec:
+  type: ClusterIP
+  selector:
+    app: management-node
+  ports:
+    - name: api
+      port: {{ .Values.management.service.bind | trimPrefix ":" | int }}
+      targetPort: {{ .Values.management.service.bind | trimPrefix ":" | int }}
+    - name: metrics
+      port: {{ .Values.management.service.serviceBind | trimPrefix ":" | int }}
+      targetPort: {{ .Values.management.service.serviceBind | trimPrefix ":" | int }}

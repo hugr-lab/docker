@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: work-headless
+  labels:
+    app: work
+spec:
+  clusterIP: None
+  selector:
+    app: work
+  ports:
+    - name: api
+      port: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
+      targetPort: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
+    - name: metrics
+      port: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}
+      targetPort: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}

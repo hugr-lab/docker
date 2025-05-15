@@ -72,9 +72,7 @@ services:
 
   # Hugr
   management:
-    build:
-      context: ..
-      dockerfile: management.dockerfile
+    image: ghcr.io/hugr-lab/management:v0.1.10
     container_name: hugr-management
     depends_on:
       core-db:
@@ -98,9 +96,7 @@ services:
       start_period: 5s
 
   node1:
-    build:
-      context: ..
-      dockerfile: server.dockerfile
+    image: ghcr.io/hugr-lab/server:v0.1.10
     container_name: hugr-node-1
     depends_on:
       redis:
@@ -144,9 +140,7 @@ services:
       start_period: 5s
 
   node2:
-    build:
-      context: ..
-      dockerfile: server.dockerfile
+    image: ghcr.io/hugr-lab/server:v0.1.10
     container_name: hugr-node-2
     depends_on:
       redis:
@@ -164,8 +158,8 @@ services:
       - node2-data:/db-home
     environment:
       BIND: :15002
-      DB_HOME_DIRECTORY: /db-home
       SERVICE_BIND: :13000
+      DB_HOME_DIRECTORY: /db-home
       CLUSTER_SECRET: 'cluster-secret'
       CLUSTER_MANAGEMENT_URL: http://management:14000
       CLUSTER_NODE_NAME: node2

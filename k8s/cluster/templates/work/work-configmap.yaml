@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: work-node-config
+  labels:
+    app: work
+data:
+  CLUSTER_SECRET: {{ .Values.management.cluster.secret | quote }}
+  BIND: {{ .Values.workNode.service.bind | quote }}
+  SERVICE_BIND: {{ .Values.workNode.service.serviceBind | quote }}
+  MAX_PARALLEL_QUERIES: {{ .Values.workNode.maxParallelQueries | quote }}
+  MAX_DEPTH: {{ .Values.workNode.maxDepthInTypes | quote }}
+  DB_PATH: {{ .Values.workNode.db.path | quote }}
+  DB_MAX_OPEN_CONNS: {{ .Values.workNode.db.maxOpenConns | quote }}
+  DB_MAX_IDLE_CONNS: {{ .Values.workNode.db.maxIdleConns | quote }}
+  DB_ALLOWED_DIRECTORIES: {{ .Values.workNode.db.allowedDirectories | quote }}
+  DB_ALLOWED_PATHS: {{ .Values.workNode.db.allowedPaths | quote }}
+  DB_ENABLE_LOGGING: {{ .Values.workNode.db.enableLogging | quote }}
+  DB_MAX_MEMORY: {{ .Values.workNode.db.maxMemory | quote }}
+  DB_MAX_TEMP_DIRECTORY_SIZE: {{ .Values.workNode.db.maxTempDirectorySize | quote }}
+  DB_TEMP_DIRECTORY: {{ .Values.workNode.db.tempDirectory | quote }}
+  DB_WORKER_THREADS: {{ .Values.workNode.db.workerThreads | quote }}
+  DB_PG_CONNECTION_LIMIT: {{ .Values.workNode.db.pgConnectionLimit | quote }}
+  DB_PG_PAGES_PER_TASK: {{ .Values.workNode.db.pgPagesPerTask | quote }}
+  CACHE_TTL: {{ .Values.workNode.cache.ttl | quote }}
+  CACHE_L1_ENABLED: {{ .Values.workNode.cache.l1.enabled | quote }}
+  CACHE_L1_MAX_SIZE: {{ .Values.workNode.cache.l1.maxSize | quote }}
+  CACHE_L1_MAX_ITEM_SIZE: {{ .Values.workNode.cache.l1.maxItemSize | quote }}
+  CACHE_L1_SHARDS: {{ .Values.workNode.cache.l1.shards | quote }}
+  CACHE_L1_CLEAN_TIME: {{ .Values.workNode.cache.l1.cleanTime | quote }}
+  CACHE_L1_EVICTION_TIME: {{ .Values.workNode.cache.l1.evictionTime | quote }}
+  CACHE_L2_ENABLED: {{ .Values.workNode.cache.l2.enabled | quote }}
+  CACHE_L2_BACKEND: {{ .Values.workNode.cache.l2.backend | quote }}
+  CACHE_L2_ADDRESSES: {{ include "cluster.Cache.Addresses" . | quote }}
+  CACHE_L2_DATABASE: {{ .Values.workNode.cache.l2.database | quote }}
+  CACHE_L2_USERNAME: {{ .Values.workNode.cache.l2.username | default .Values.cache.auth.username | quote }}
+  CACHE_L2_PASSWORD: {{ .Values.workNode.cache.l2.password | default .Values.cache.auth.password | quote }}

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: work-shared-pvc
+  labels:
+    app: work
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.workNode.shared.size | default "10Gi" }}
+  volumeName: work-shared-pv

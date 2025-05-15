@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: work
+  annotations:
+    {{- if .Values.prometheus.enabled }}
+    prometheus.io/scrape: "true"
+    {{- end }}
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: work
+                port:
+                  number: {{ .Values.workNode.service.bind | trimPrefix ":" | int | default 15000 }}

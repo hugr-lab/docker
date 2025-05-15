@@ -1,0 +1,34 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: management-node-config
+  labels:
+    app: management
+data:
+    BIND: {{ .Values.management.service.bind | quote }}
+    SERVICE_BIND: {{ .Values.management.service.serviceBind | quote }}
+    SECRET: {{ .Values.management.cluster.secret | quote }}
+    TIMEOUT: {{ .Values.management.cluster.timeout | quote }}
+    CHECK: {{ .Values.management.cluster.check | quote }}
+    {{/* oidc settings */}}
+    OIDC_ISSUER: {{ .Values.management.oidc.issuer | quote }}
+    OIDC_CLIENT_ID: {{ .Values.management.oidc.clientID | quote }}
+    OIDC_TIMEOUT: {{ .Values.management.oidc.timeout | quote }}
+    OIDC_COOKIE_NAME: {{ .Values.management.oidc.cookieName | quote }}
+    OIDC_SCOPE_ROLE_PREFIX: {{ .Values.management.oidc.scopeRolePrefix | quote }}
+    OIDC_CLAIMS_USER_ID: {{ .Values.management.oidc.claims.userId | quote }}
+    OIDC_CLAIMS_USER_NAME: {{ .Values.management.oidc.claims.userName | quote }}
+    OIDC_CLAIMS_ROLE: {{ .Values.management.oidc.claims.role | quote }}
+    {{/* work node settings */}}
+    DEBUG: {{ .Values.management.workNode.debug | quote }}
+    ADMIN_UI: {{ .Values.management.workNode.adminUI | quote }}
+    ADMIN_UI_FETCH_PATH: {{ .Values.management.workNode.adminUIFetchPath | quote }}
+    CORE_DB_PATH: {{ include "cluster.CoreDB.DSN" . | quote }}
+    CORS_ALLOWED_ORIGINS: {{ .Values.management.workNode.cors.allowedOrigins | quote }}
+    CORS_ALLOWED_METHODS: {{ .Values.management.workNode.cors.allowedMethods | quote }}
+    CORS_ALLOWED_HEADERS: {{ .Values.management.workNode.cors.allowedHeaders | quote }}
+    ALLOW_MANAGED_API_KEYS: {{ .Values.management.workNode.auth.managedApiKeys | quote }}
+    ALLOWED_ANONYMOUS: {{ .Values.management.workNode.auth.allowedAnonymous | quote }}
+    ANONYMOUS_ROLE: {{ .Values.management.workNode.auth.anonymousRole | quote }}
+    AUTH_CONFIG_FILE: {{ .Values.management.workNode.auth.configFile | quote }}
+    

@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: work
+  labels:
+    app: work
+spec:
+  serviceName: work-headless
+  replicas: {{ .Values.workNode.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: work
+  template:
+    metadata:
+      labels:
+        app: work
+      annotations:
+        {{- if .Values.prometheus.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
+        prometheus.io/path: /metrics
+        {{- end }}
+    spec:
+      initContainers:
+        - name: wait-for-management
+          image: curlimages/curl
+          command:
+            - sh
+            - -c
+            - >
+              MANAGEMENT_NODE_URL=http://management-node:{{ .Values.management.service.serviceBind | trimPrefix ":" }};
+              until curl -sf $MANAGEMENT_NODE_URL/health;
+              do echo "Waiting for management node at $MANAGEMENT_NODE_URL to be ready..." ; sleep 1; done
+        {{- if .Values.cache.enabled }}
+        - name: wait-for-cache
+          image: busybox
+          command:
+            - sh
+            - -c
+            - >
+              CACHE_NODE="{{ include "cluster.Cache.Host" . }}";
+              CACHE_NODE_PORT={{ .Values.cache.redis.port | default 6379 }};
+              until nc -z $CACHE_NODE $CACHE_NODE_PORT;
+              do echo "Waiting for cache node at $CACHE_NODE:$CACHE_NODE_PORT to be ready..." ; sleep 1; done
+        {{- end}}
+      containers:
+        - name: work
+          image: {{ .Values.workNode.image.repository }}:{{ .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.workNode.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - containerPort: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
+            - containerPort: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}
+          envFrom:
+            - configMapRef:
+                name: work-node-config
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CLUSTER_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CLUSTER_NODE_URL
+              value: "http://$(CLUSTER_NODE_NAME).work-headless.{{ .Release.Namespace }}.svc.cluster.local{{ .Values.workNode.service.bind }}/ipc"
+            - name: CLUSTER_MANAGEMENT_URL
+              value: "http://management-node:{{ .Values.management.service.bind | trimPrefix ":" }}"
+            - name: DB_HOME_DIRECTORY
+              value: {{ .Values.workNode.dbHome.mountPath | default "/db-home" }}
+          volumeMounts:
+            - name: shared
+              mountPath: /data
+            - name: db-home
+              mountPath: {{ .Values.workNode.dbHome.mountPath | default "/db-home" }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}
+            initialDelaySeconds: 10
+            periodSeconds: 30
+      volumes:
+        - name: shared
+          persistentVolumeClaim:
+            claimName: work-shared-pvc
+  volumeClaimTemplates:
+    - metadata:
+        name: db-home
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.workNode.dbHome.storageClass | default "standard" }}
+        resources:
+          requests:
+            storage: {{ .Values.workNode.dbHome.storage | default "1Gi" }}

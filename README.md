@@ -4,15 +4,21 @@ The docker images of the Hugr service.
 There are two images:
 
 - ghcr.io/hugr-lab/server - simple hugr server,
-- ghcr.io/hugr-lab/automigrate - simple hugr server with automigration for the core-db schema.
+- ghcr.io/hugr-lab/automigrate - simple hugr server with automigration for the core-db schema,
+- ghcr.io/hugr-lab/management - management node for the cluster mode.
 
-The images are built using linux.dockerfile (server) and automigrate.dockerfile (automigrate).
+The images are built using files:
+
+- server.dockerfile,
+- automigrate.dockerfile,
+- management.dockerfile.
 
 The automation builds provided by GitHub actions are triggered by the new release tag. The version of images is the same as [Hugr](https://github.com/hugr-lab/hugr). To build the images manually, you can use the following commands:
 
 ```bash
 docker build -t ghcr.io/hugr-lab/server:latest -f linux.dockerfile .
 docker build -t ghcr.io/hugr-lab/automigrate:latest -f automigrate.dockerfile .
+docker build -t ghcr.io/hugr-lab/management:latest -f management.dockerfile .
 ```
 
 Or you can build and run it using docker compose. The compose file is provided in the `compose` directory. The compose file is used to run the server and the database.
@@ -38,6 +44,18 @@ There is an example of docker-compose file that describes Hugr, cache and s3 (mi
 docker compose -f example.cache.docker-compose.yml up
 ```
 
+## Cluster deployment
+
+The hugr can naitively run in cluster mode. The cluster mode is used to run the server in a distributed environment. To sync the work nodes across the cluster hugr provide a special management node. The management node can be deployed from the docker image `ghcr.io/hugr-lab/management:latest`. The work nodes are the hugr server nodes, that are deployed with environment variables `CLUSTER_*`(see - [hugr README](https://github.com/hugr-lab/hugr/README.md)).
+
+There is an example of docker-compose file that describes Hugr, cache and s3 (minio) services, hugr run in cluster mode (the two nodes is used). To run the example, you can use the following command:
+
+```bash
+docker compose -f example.cluster.docker-compose.yml up
+```
+
+Also there are k8s chart for the cluster deployment in the `k8s/cluster` directory. To set up cluster locally see [minikube-cluster.md](examples/minikube-cluster.md).
+
 ## Pull images
 
 To pull the images from the GitHub container registry, you can use the following commands:
@@ -45,6 +63,7 @@ To pull the images from the GitHub container registry, you can use the following
 ```bash
 docker pull ghcr.io/hugr-lab/server:latest
 docker pull ghcr.io/hugr-lab/automigrate:latest
+docker pull ghcr.io/hugr-lab/management:latest
 ```
 
 You can also save and load the images to/from a tar file using the following commands:
@@ -59,6 +78,12 @@ docker load -i hugr-server.tar
 docker pull ghcr.io/hugr-lab/automigrate:latest --platform linux/amd64 
 docker save -o hugr-automigrate.tar ghcr.io/hugr-lab/automigrate:latest --platform linux/amd64
 docker load -i hugr-automigrate.tar
+```
+
+```bash
+docker pull ghcr.io/hugr-lab/management:latest --platform linux/amd64 
+docker save -o hugr-management.tar ghcr.io/hugr-lab/management:latest --platform linux/amd64
+docker load -i hugr-management.tar
 ```
 
 ## Contributing

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: management-node
+  labels:
+    app: management-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: management-node
+  template:
+    metadata:
+      labels:
+        app: management-node
+      annotations:
+        {{- if .Values.prometheus.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.management.service.bind | trimPrefix ":" | int }}
+        prometheus.io/path: /metrics
+        {{- end }}
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: bitnami/postgresql:15
+          command:
+            - bash
+            - -c
+            - >
+              until pg_isready -h {{ .Values.postgresql.fullnameOverride | default (printf "%s-postgresql" .Release.Name) }} -p {{ .Values.postgresql.service.port | default 5432 }} -U {{ .Values.postgresql.auth.username | default "postgres" }};
+              do echo "Waiting for PostgreSQL..."; sleep 3; done
+          env:
+            - name: PGPASSWORD
+              value: {{ .Values.postgresql.auth.password | default .Values.postgresql.auth.postgresPassword | quote }}
+      containers:
+        - name: management-node
+          image: {{ .Values.management.image.repository }}:{{ default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.management.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.management.service.bind | trimPrefix ":" | int }}
+            - containerPort: {{ .Values.management.service.serviceBind | trimPrefix ":" | int }}
+          envFrom:
+            - configMapRef:
+                name: management-node-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.management.service.serviceBind | trimPrefix ":" | int }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.management.service.serviceBind | trimPrefix ":" | int }}
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            

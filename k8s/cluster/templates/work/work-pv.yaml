@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: work-shared-pv
+  labels:
+    app: work
+spec:
+  capacity:
+    storage: {{ .Values.workNode.shared.size | default "10Gi" }}
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: {{ .Values.workNode.shared.hostPath | default "/tmp/work" }}
+    type: DirectoryOrCreate
