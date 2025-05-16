@@ -27,6 +27,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Show tag
+        run: |
+          echo "Tag: ${{ github.ref_name }}"
 
       - name: Build and push base image
         uses: docker/build-push-action@v5

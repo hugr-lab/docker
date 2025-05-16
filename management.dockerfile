@@ -6,13 +6,15 @@ RUN apt-get update && apt-get install -y git curl && rm -rf /var/lib/apt/lists/*
 
 ARG HUGR_VERSION=latest
 ENV HUGR_VERSION=${HUGR_VERSION}
-
-RUN git clone --depth 1 --branch ${HUGR_VERSION} https://github.com/hugr-lab/hugr.git hugr
+RUN echo "HUGR_VERSION=${HUGR_VERSION}"
+RUN git clone https://github.com/hugr-lab/hugr.git hugr
 WORKDIR /app/hugr
 
+RUN git checkout ${HUGR_VERSION}
+
 RUN go mod download
-RUN make migrate
-RUN make management
+RUN make migrate GIT_VERSION=${HUGR_VERSION}
+RUN make management GIT_VERSION=${HUGR_VERSION}
 
 RUN cp -r /app/hugr/migrations /migrations
 
