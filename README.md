@@ -16,7 +16,7 @@ The images are built using files:
 The automation builds provided by GitHub actions are triggered by the new release tag. The version of images is the same as [Hugr](https://github.com/hugr-lab/hugr). To build the images manually, you can use the following commands:
 
 ```bash
-docker build -t ghcr.io/hugr-lab/server:latest -f linux.dockerfile .
+docker build -t ghcr.io/hugr-lab/server:latest -f server.dockerfile .
 docker build -t ghcr.io/hugr-lab/automigrate:latest -f automigrate.dockerfile .
 docker build -t ghcr.io/hugr-lab/management:latest -f management.dockerfile .
 ```
