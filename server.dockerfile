@@ -27,9 +27,6 @@ RUN set -eux; \
 ENV PATH="/usr/local/go/bin:${PATH}"
 RUN go version
 
-ARG HUGR_VERSION=latest
-ENV HUGR_VERSION=${HUGR_VERSION}
-RUN echo "HUGR_VERSION=${HUGR_VERSION}"
 RUN git clone https://github.com/hugr-lab/hugr.git hugr
 WORKDIR /app/hugr
 
