@@ -1,5 +1,9 @@
 # Hugr docker images
 
+The `hugr` is a Data Mesh platform that provides a simple way to manage and share data across different teams and services. It is designed to be easy to use and deploy, with a focus on simplicity and flexibility.
+
+For more information about the Hugr project, please visit the [Hugr web site](https://hugr-lab.github.io/).
+
 The docker images of the Hugr service.
 There are two images:
 
