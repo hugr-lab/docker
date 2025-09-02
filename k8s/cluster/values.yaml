@@ -5,7 +5,7 @@ ingress:
 management:
   image:
     repository: ghcr.io/hugr-lab/management
-    tag: v0.1.26
+    tag: v0.1.27
     pullPolicy: IfNotPresent
 
   service:
@@ -47,7 +47,7 @@ management:
 workNode:
   image:
     repository: ghcr.io/hugr-lab/server
-    tag: v0.1.26
+    tag: v0.1.27
     pullPolicy: IfNotPresent
   
   replicas: 3
