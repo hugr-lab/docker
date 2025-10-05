@@ -5,7 +5,7 @@ The `hugr` is a Data Mesh platform that provides a simple way to manage and shar
 For more information about the Hugr project, please visit the [Hugr web site](https://hugr-lab.github.io/).
 
 The docker images of the Hugr service.
-There are two images:
+There are three images:
 
 - ghcr.io/hugr-lab/server - simple hugr server,
 - ghcr.io/hugr-lab/automigrate - simple hugr server with automigration for the core-db schema,
