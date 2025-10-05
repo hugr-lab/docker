@@ -1,9 +1,9 @@
-FROM ubuntu:24.10 AS builder
+FROM ubuntu:24.04 AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y wget git g++ gcc libc6-dev make pkg-config && rm -rf /var/lib/apt/lists/*
 
-ARG GO_VERSION=1.24.5
+ARG GO_VERSION=1.25.0
 ARG HUGR_VERSION=latest
 ENV HUGR_VERSION=${HUGR_VERSION}
 ENV GO_VERSION=${GO_VERSION}
@@ -38,10 +38,10 @@ RUN make migrate GIT_VERSION=${HUGR_VERSION}
 
 RUN cp -r /app/hugr/migrations /migrations
 
-# We use ubuntu:24.10 because it has the necessary dependencies for DuckDB. Even though go-duckdb statically
+# We use ubuntu:24.04 because it has the necessary dependencies for DuckDB. Even though go-duckdb statically
 # links the DuckDB library, it still needs some dependencies to be present on the system. This is a known issue:
 # https://github.com/duckdb/duckdb/issues/17632
-FROM ubuntu:24.10
+FROM ubuntu:24.04
 USER root
 WORKDIR /app
 
