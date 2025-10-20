@@ -3,7 +3,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y wget git g++ gcc libc6-dev make pkg-config && rm -rf /var/lib/apt/lists/*
 
-ARG GO_VERSION=1.25.0
+ARG GO_VERSION=1.25.3
 ARG HUGR_VERSION=latest
 ENV HUGR_VERSION=${HUGR_VERSION}
 ENV GO_VERSION=${GO_VERSION}
@@ -33,6 +33,7 @@ WORKDIR /app/hugr
 RUN git checkout ${HUGR_VERSION}
 
 RUN go mod download
+RUN make server GIT_VERSION=${HUGR_VERSION}
 RUN make migrate GIT_VERSION=${HUGR_VERSION}
 RUN make management GIT_VERSION=${HUGR_VERSION}
 
@@ -44,7 +45,18 @@ RUN cp -r /app/hugr/migrations /migrations
 FROM ubuntu:24.04
 USER root
 WORKDIR /app
-RUN apt-get update && apt-get install -y curl libcurl4 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf \
+        /var/lib/apt/lists/* \
+        /usr/share/doc/* \
+        /usr/share/man/* \
+        /usr/share/locale/* \
+        /var/cache/* \
+        /tmp/* \
+        /var/tmp/*
 
 COPY --from=builder /app/hugr/management hugr-management
 COPY --from=builder /app/hugr/migrate .
