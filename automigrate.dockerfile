@@ -45,6 +45,19 @@ FROM ubuntu:24.04
 USER root
 WORKDIR /app
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf \
+        /var/lib/apt/lists/* \
+        /usr/share/doc/* \
+        /usr/share/man/* \
+        /usr/share/locale/* \
+        /var/cache/* \
+        /tmp/* \
+        /var/tmp/*
+
 COPY --from=builder /app/hugr/server hugr-server
 COPY --from=builder /app/hugr/migrate .
 COPY --from=builder migrations migrations
