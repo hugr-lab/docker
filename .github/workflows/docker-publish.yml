@@ -3,7 +3,7 @@ name: Build and Publish Docker Image
 on:
   push:
     tags:
-      - 'v*'  # Только при пуше версии, например v1.0.0
+      - 'v*'  # Trigger on version tags starting with 'v'
 
 jobs:
   build-and-push:
