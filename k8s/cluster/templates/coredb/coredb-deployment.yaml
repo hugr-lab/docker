@@ -1,0 +1,67 @@
+{{- if not .Values.postgresql.bitnami }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: coredb
+  labels:
+    app: coredb
+spec:
+  serviceName: coredb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coredb
+  template:
+    metadata:
+      labels:
+        app: coredb
+    spec:
+      containers:
+        - name: postgresql
+          image: {{ .Values.coreDB.image.repository }}:{{ .Values.coreDB.image.tag }}
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.coreDB.auth.username | default "postgres" | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.coreDB.auth.password | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.coreDB.name | default "hugr-core" | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ .Values.coreDB.auth.username | default "postgres" | quote }}]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ .Values.coreDB.auth.username | default "postgres" | quote }}]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.coreDB.storageClass | default "standard" }}
+        resources:
+          requests:
+            storage: {{ .Values.coreDB.storage | default "1Gi" }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredb
+  labels:
+    app: coredb
+spec:
+  type: ClusterIP
+  selector:
+    app: coredb
+  ports:
+    - port: 5432
+      targetPort: 5432
+{{- end }}

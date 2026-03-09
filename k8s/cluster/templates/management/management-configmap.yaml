@@ -5,11 +5,42 @@ metadata:
   labels:
     app: management
 data:
-    BIND: {{ .Values.management.service.bind | quote }}
-    SERVICE_BIND: {{ .Values.management.service.serviceBind | quote }}
-    SECRET: {{ .Values.management.cluster.secret | quote }}
-    TIMEOUT: {{ .Values.management.cluster.timeout | quote }}
-    CHECK: {{ .Values.management.cluster.check | quote }}
+    BIND: {{ .Values.management.bind | quote }}
+    SERVICE_BIND: {{ .Values.management.serviceBind | quote }}
+    CORE_DB_PATH: {{ include "cluster.CoreDB.DSN" . | quote }}
+    {{/* cluster settings */}}
+    CLUSTER_ENABLED: "true"
+    CLUSTER_ROLE: {{ .Values.management.cluster.role | quote }}
+    CLUSTER_NODE_NAME: {{ .Values.management.cluster.nodeName | quote }}
+    CLUSTER_NODE_URL: "http://management-node:{{ include "cluster.bindPort" .Values.management.bind }}/ipc"
+    CLUSTER_SECRET: {{ .Values.cluster.secret | quote }}
+    CLUSTER_HEARTBEAT: {{ .Values.management.cluster.heartbeat | quote }}
+    CLUSTER_GHOST_TTL: {{ .Values.management.cluster.ghostTTL | quote }}
+    {{/* mcp settings */}}
+    MCP_ENABLED: {{ .Values.management.mcp.enabled | quote }}
+    EMBEDDER_URL: {{ .Values.management.mcp.embedderURL | quote }}
+    EMBEDDER_VECTOR_SIZE: {{ .Values.management.mcp.vectorSize | quote }}
+    {{/* query settings */}}
+    ALLOW_PARALLEL: {{ .Values.management.allowParallel | quote }}
+    MAX_PARALLEL_QUERIES: {{ .Values.management.maxParallelQueries | quote }}
+    MAX_DEPTH: {{ .Values.management.maxDepthInTypes | quote }}
+    {{/* schema cache settings */}}
+    SCHEMA_CACHE_MAX_ENTRIES: {{ .Values.management.schemaCache.maxEntries | quote }}
+    SCHEMA_CACHE_TTL: {{ .Values.management.schemaCache.ttl | quote }}
+    {{/* db settings */}}
+    DB_PATH: {{ .Values.management.db.path | quote }}
+    DB_HOME_DIRECTORY: {{ .Values.management.db.homeDirectory | quote }}
+    DB_MAX_OPEN_CONNS: {{ .Values.management.db.maxOpenConns | quote }}
+    DB_MAX_IDLE_CONNS: {{ .Values.management.db.maxIdleConns | quote }}
+    DB_ALLOWED_DIRECTORIES: {{ .Values.management.db.settings.allowedDirectories | quote }}
+    DB_ALLOWED_PATHS: {{ .Values.management.db.settings.allowedPaths | quote }}
+    DB_ENABLE_LOGGING: {{ .Values.management.db.settings.enableLogging | quote }}
+    DB_MAX_MEMORY: {{ .Values.management.db.settings.maxMemory | quote }}
+    DB_MAX_TEMP_DIRECTORY_SIZE: {{ .Values.management.db.settings.maxTempDirectorySize | quote }}
+    DB_TEMP_DIRECTORY: {{ .Values.management.db.settings.tempDirectory | quote }}
+    DB_WORKER_THREADS: {{ .Values.management.db.settings.workerThreads | quote }}
+    DB_PG_CONNECTION_LIMIT: {{ .Values.management.db.settings.pgConnectionLimit | quote }}
+    DB_PG_PAGES_PER_TASK: {{ .Values.management.db.settings.pgPagesPerTask | quote }}
     {{/* oidc settings */}}
     OIDC_ISSUER: {{ .Values.management.oidc.issuer | quote }}
     OIDC_CLIENT_ID: {{ .Values.management.oidc.clientID | quote }}
@@ -19,16 +50,17 @@ data:
     OIDC_CLAIMS_USER_ID: {{ .Values.management.oidc.claims.userId | quote }}
     OIDC_CLAIMS_USER_NAME: {{ .Values.management.oidc.claims.userName | quote }}
     OIDC_CLAIMS_ROLE: {{ .Values.management.oidc.claims.role | quote }}
-    {{/* work node settings */}}
-    DEBUG: {{ .Values.management.workNode.debug | quote }}
-    ADMIN_UI: {{ .Values.management.workNode.adminUI | quote }}
-    ADMIN_UI_FETCH_PATH: {{ .Values.management.workNode.adminUIFetchPath | quote }}
-    CORE_DB_PATH: {{ include "cluster.CoreDB.DSN" . | quote }}
-    CORS_ALLOWED_ORIGINS: {{ .Values.management.workNode.cors.allowedOrigins | quote }}
-    CORS_ALLOWED_METHODS: {{ .Values.management.workNode.cors.allowedMethods | quote }}
-    CORS_ALLOWED_HEADERS: {{ .Values.management.workNode.cors.allowedHeaders | quote }}
-    ALLOW_MANAGED_API_KEYS: {{ .Values.management.workNode.auth.managedApiKeys | quote }}
-    ALLOWED_ANONYMOUS: {{ .Values.management.workNode.auth.allowedAnonymous | quote }}
-    ANONYMOUS_ROLE: {{ .Values.management.workNode.auth.anonymousRole | quote }}
-    AUTH_CONFIG_FILE: {{ .Values.management.workNode.auth.configFile | quote }}
-    
+    {{/* server settings */}}
+    DEBUG: {{ .Values.management.debug | quote }}
+    ADMIN_UI: {{ .Values.management.adminUI | quote }}
+    ADMIN_UI_FETCH_PATH: {{ .Values.management.adminFetchPath | quote }}
+    SECRET_KEY: {{ .Values.management.secretKey | quote }}
+    {{/* cors settings */}}
+    CORS_ALLOWED_ORIGINS: {{ .Values.management.cors.allowedOrigins | quote }}
+    CORS_ALLOWED_METHODS: {{ .Values.management.cors.allowedMethods | quote }}
+    CORS_ALLOWED_HEADERS: {{ .Values.management.cors.allowedHeaders | quote }}
+    {{/* auth settings */}}
+    ALLOW_MANAGED_API_KEYS: {{ .Values.management.auth.managedApiKeys | quote }}
+    ALLOWED_ANONYMOUS: {{ .Values.management.auth.allowedAnonymous | quote }}
+    ANONYMOUS_ROLE: {{ .Values.management.auth.anonymousRole | quote }}
+    AUTH_CONFIG_FILE: {{ .Values.management.auth.configFile | quote }}

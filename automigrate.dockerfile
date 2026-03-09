@@ -3,7 +3,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y wget git g++ gcc libc6-dev make pkg-config && rm -rf /var/lib/apt/lists/*
 
-ARG GO_VERSION=1.26.0
+ARG GO_VERSION=1.26.1
 ARG HUGR_VERSION=latest
 ENV HUGR_VERSION=${HUGR_VERSION}
 ENV GO_VERSION=${GO_VERSION}
@@ -46,7 +46,7 @@ USER root
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get install -y --no-install-recommends ca-certificates curl && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf \
@@ -61,7 +61,7 @@ RUN apt-get update && \
 COPY --from=builder /app/hugr/server hugr-server
 COPY --from=builder /app/hugr/migrate .
 COPY --from=builder migrations migrations
-COPY run-server-migrate.sh run-service.sh
+COPY run-migrate.sh run-service.sh
 
 RUN /app/hugr-server --install
 

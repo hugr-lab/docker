@@ -11,8 +11,8 @@ spec:
     app: management-node
   ports:
     - name: api
-      port: {{ .Values.management.service.bind | trimPrefix ":" | int }}
-      targetPort: {{ .Values.management.service.bind | trimPrefix ":" | int }}
+      port: {{ include "cluster.bindPort" .Values.management.bind | int }}
+      targetPort: {{ include "cluster.bindPort" .Values.management.bind | int }}
     - name: metrics
-      port: {{ .Values.management.service.serviceBind | trimPrefix ":" | int }}
-      targetPort: {{ .Values.management.service.serviceBind | trimPrefix ":" | int }}
+      port: {{ include "cluster.bindPort" .Values.management.serviceBind | int }}
+      targetPort: {{ include "cluster.bindPort" .Values.management.serviceBind | int }}

@@ -1,13 +1,14 @@
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: work
+  name: hugr-cluster
   annotations:
     {{- if .Values.prometheus.enabled }}
     prometheus.io/scrape: "true"
     {{- end }}
 spec:
-  ingressClassName: traefik
+  ingressClassName: {{ .Values.ingress.className | default "nginx" }}
   rules:
     - host: {{ .Values.ingress.host | quote }}
       http:
@@ -16,6 +17,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: work
+                name: hugr-cluster
                 port:
-                  number: {{ .Values.workNode.service.bind | trimPrefix ":" | int | default 15000 }}
+                  number: {{ include "cluster.bindPort" .Values.workNode.bind | int }}
+{{- end }}

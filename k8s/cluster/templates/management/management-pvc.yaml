@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: management-db-home
+  labels:
+    app: management-node
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.management.dbHome.storageClass | default "standard" }}
+  resources:
+    requests:
+      storage: {{ .Values.management.dbHome.storage | default "1Gi" }}
