@@ -10,5 +10,5 @@ spec:
     app: work
   ports:
     - name: api
-      port: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
-      targetPort: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
+      port: {{ include "cluster.bindPort" .Values.workNode.bind | int }}
+      targetPort: {{ include "cluster.bindPort" .Values.workNode.bind | int }}

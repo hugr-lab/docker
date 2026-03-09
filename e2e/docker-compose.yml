@@ -1,0 +1,151 @@
+services:
+  # --- Shared data source ---
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    volumes:
+      - ./testdata/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d testdb"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  # --- Shared CoreDB for cluster tests ---
+  core-postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: coredb
+      POSTGRES_USER: hugr
+      POSTGRES_PASSWORD: hugr
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hugr -d coredb"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  # --- Test 1: Standalone with DuckDB CoreDB (automigrate image) ---
+  standalone:
+    build:
+      context: ../
+      dockerfile: automigrate.dockerfile
+      args:
+        HUGR_VERSION: "${HUGR_VERSION:-main}"
+    ports: ["15000:15000"]
+    environment:
+      BIND: ":15000"
+      SERVICE_BIND: ":13000"
+      CORE_DB_PATH: ""
+      ALLOWED_ANONYMOUS: "true"
+      ANONYMOUS_ROLE: "admin"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:13000/health || exit 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  # --- Test 2: Standalone with PostgreSQL CoreDB (automigrate image) ---
+  standalone-pg:
+    build:
+      context: ../
+      dockerfile: automigrate.dockerfile
+      args:
+        HUGR_VERSION: "${HUGR_VERSION:-main}"
+    ports: ["15001:15000"]
+    environment:
+      BIND: ":15000"
+      SERVICE_BIND: ":13000"
+      CORE_DB_PATH: "postgres://hugr:hugr@core-postgres:5432/coredb_standalone"
+      ALLOWED_ANONYMOUS: "true"
+      ANONYMOUS_ROLE: "admin"
+    depends_on:
+      core-postgres:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:13000/health || exit 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  # --- Test 3: Cluster — management (automigrate image) ---
+  cluster-mgmt:
+    build:
+      context: ../
+      dockerfile: automigrate.dockerfile
+      args:
+        HUGR_VERSION: "${HUGR_VERSION:-main}"
+    ports: ["15010:15000"]
+    environment:
+      BIND: ":15000"
+      SERVICE_BIND: ":13000"
+      CORE_DB_PATH: "postgres://hugr:hugr@core-postgres:5432/coredb_cluster"
+      ALLOWED_ANONYMOUS: "true"
+      ANONYMOUS_ROLE: "admin"
+      CLUSTER_ENABLED: "true"
+      CLUSTER_ROLE: "management"
+      CLUSTER_NODE_NAME: "mgmt"
+      CLUSTER_NODE_URL: "http://cluster-mgmt:15000/ipc"
+      CLUSTER_SECRET: "e2e-test-secret"
+      CLUSTER_HEARTBEAT: "5s"
+      CLUSTER_GHOST_TTL: "60s"
+    depends_on:
+      core-postgres:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:13000/health || exit 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  # --- Test 3: Cluster — worker (server image) ---
+  cluster-worker:
+    build:
+      context: ../
+      dockerfile: server.dockerfile
+      args:
+        HUGR_VERSION: "${HUGR_VERSION:-main}"
+    ports: ["15011:15000"]
+    environment:
+      BIND: ":15000"
+      SERVICE_BIND: ":13000"
+      CORE_DB_PATH: "postgres://hugr:hugr@core-postgres:5432/coredb_cluster"
+      ALLOWED_ANONYMOUS: "true"
+      ANONYMOUS_ROLE: "admin"
+      CLUSTER_ENABLED: "true"
+      CLUSTER_ROLE: "worker"
+      CLUSTER_NODE_NAME: "worker-1"
+      CLUSTER_NODE_URL: "http://cluster-worker:15000/ipc"
+      CLUSTER_SECRET: "e2e-test-secret"
+      CLUSTER_POLL_INTERVAL: "5s"
+    depends_on:
+      cluster-mgmt:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:13000/health || exit 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  # --- Test 3: Cluster — nginx load balancer ---
+  cluster-nginx:
+    image: nginx:alpine
+    ports: ["15020:15000"]
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      cluster-mgmt:
+        condition: service_healthy
+      cluster-worker:
+        condition: service_healthy

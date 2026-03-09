@@ -17,21 +17,23 @@ spec:
       annotations:
         {{- if .Values.prometheus.enabled }}
         prometheus.io/scrape: "true"
-        prometheus.io/port: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
+        prometheus.io/port: {{ include "cluster.bindPort" .Values.workNode.bind | quote }}
         prometheus.io/path: /metrics
         {{- end }}
     spec:
       initContainers:
-        - name: wait-for-management
-          image: curlimages/curl
+        - name: wait-for-postgres
+          image: postgres:16-alpine
           command:
             - sh
             - -c
             - >
-              MANAGEMENT_NODE_URL=http://management-node:{{ .Values.management.service.serviceBind | trimPrefix ":" }};
-              until curl -sf $MANAGEMENT_NODE_URL/health;
-              do echo "Waiting for management node at $MANAGEMENT_NODE_URL to be ready..." ; sleep 1; done
-        {{- if .Values.cache.enabled }}
+              until pg_isready -h {{ include "cluster.CoreDB.Host" . }} -p {{ include "cluster.CoreDB.Port" . }} -U {{ include "cluster.CoreDB.Username" . }};
+              do echo "Waiting for PostgreSQL..."; sleep 3; done
+          env:
+            - name: PGPASSWORD
+              value: {{ include "cluster.CoreDB.Password" . | quote }}
+        {{- if .Values.workNode.cache.l2.enabled }}
         - name: wait-for-cache
           image: busybox
           command:
@@ -45,11 +47,11 @@ spec:
         {{- end}}
       containers:
         - name: work
-          image: {{ .Values.workNode.image.repository }}:{{ .Chart.AppVersion }}
+          image: {{ .Values.workNode.image.repository }}:{{ .Values.workNode.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.workNode.image.pullPolicy | default "IfNotPresent" }}
           ports:
-            - containerPort: {{ .Values.workNode.service.bind | trimPrefix ":" | int }}
-            - containerPort: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}
+            - containerPort: {{ include "cluster.bindPort" .Values.workNode.bind | int }}
+            - containerPort: {{ include "cluster.bindPort" .Values.workNode.serviceBind | int }}
           envFrom:
             - configMapRef:
                 name: work-node-config
@@ -63,9 +65,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: CLUSTER_NODE_URL
-              value: "http://$(CLUSTER_NODE_NAME).work-headless.{{ .Release.Namespace }}.svc.cluster.local{{ .Values.workNode.service.bind }}/ipc"
-            - name: CLUSTER_MANAGEMENT_URL
-              value: "http://management-node:{{ .Values.management.service.bind | trimPrefix ":" }}"
+              value: "http://$(CLUSTER_NODE_NAME).work-headless.{{ .Release.Namespace }}.svc.cluster.local:{{ include "cluster.bindPort" .Values.workNode.bind }}/ipc"
+            - name: CORE_DB_PATH
+              value: {{ include "cluster.CoreDB.DSN" . | quote }}
             - name: DB_HOME_DIRECTORY
               value: {{ .Values.workNode.dbHome.mountPath | default "/db-home" }}
           volumeMounts:
@@ -76,13 +78,13 @@ spec:
           readinessProbe:
             httpGet:
               path: /health
-              port: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}
+              port: {{ include "cluster.bindPort" .Values.workNode.serviceBind | int }}
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /health
-              port: {{ .Values.workNode.service.serviceBind | trimPrefix ":" | int }}
+              port: {{ include "cluster.bindPort" .Values.workNode.serviceBind | int }}
             initialDelaySeconds: 10
             periodSeconds: 30
       volumes:

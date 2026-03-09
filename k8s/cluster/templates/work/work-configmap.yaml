@@ -5,23 +5,63 @@ metadata:
   labels:
     app: work
 data:
-  CLUSTER_SECRET: {{ .Values.management.cluster.secret | quote }}
-  BIND: {{ .Values.workNode.service.bind | quote }}
-  SERVICE_BIND: {{ .Values.workNode.service.serviceBind | quote }}
+  BIND: {{ .Values.workNode.bind | quote }}
+  SERVICE_BIND: {{ .Values.workNode.serviceBind | quote }}
+  CORE_DB_PATH: {{ include "cluster.CoreDB.DSN" . | quote }}
+  {{/* cluster settings */}}
+  CLUSTER_ENABLED: "true"
+  CLUSTER_ROLE: {{ .Values.workNode.cluster.role | quote }}
+  CLUSTER_SECRET: {{ .Values.workNode.cluster.secret | quote }}
+  CLUSTER_POLL_INTERVAL: {{ .Values.workNode.cluster.pollInterval | quote }}
+  {{/* mcp settings */}}
+  MCP_ENABLED: {{ .Values.workNode.mcp.enabled | quote }}
+  EMBEDDER_URL: {{ .Values.workNode.mcp.embedderURL | quote }}
+  EMBEDDER_VECTOR_SIZE: {{ .Values.workNode.mcp.vectorSize | quote }}
+  {{/* query settings */}}
+  ALLOW_PARALLEL: {{ .Values.workNode.allowParallel | quote }}
   MAX_PARALLEL_QUERIES: {{ .Values.workNode.maxParallelQueries | quote }}
   MAX_DEPTH: {{ .Values.workNode.maxDepthInTypes | quote }}
+  {{/* schema cache settings */}}
+  SCHEMA_CACHE_MAX_ENTRIES: {{ .Values.workNode.schemaCache.maxEntries | quote }}
+  SCHEMA_CACHE_TTL: {{ .Values.workNode.schemaCache.ttl | quote }}
+  {{/* db settings */}}
   DB_PATH: {{ .Values.workNode.db.path | quote }}
+  DB_HOME_DIRECTORY: {{ .Values.workNode.db.homeDirectory | quote }}
   DB_MAX_OPEN_CONNS: {{ .Values.workNode.db.maxOpenConns | quote }}
   DB_MAX_IDLE_CONNS: {{ .Values.workNode.db.maxIdleConns | quote }}
-  DB_ALLOWED_DIRECTORIES: {{ .Values.workNode.db.allowedDirectories | quote }}
-  DB_ALLOWED_PATHS: {{ .Values.workNode.db.allowedPaths | quote }}
-  DB_ENABLE_LOGGING: {{ .Values.workNode.db.enableLogging | quote }}
-  DB_MAX_MEMORY: {{ .Values.workNode.db.maxMemory | quote }}
-  DB_MAX_TEMP_DIRECTORY_SIZE: {{ .Values.workNode.db.maxTempDirectorySize | quote }}
-  DB_TEMP_DIRECTORY: {{ .Values.workNode.db.tempDirectory | quote }}
-  DB_WORKER_THREADS: {{ .Values.workNode.db.workerThreads | quote }}
-  DB_PG_CONNECTION_LIMIT: {{ .Values.workNode.db.pgConnectionLimit | quote }}
-  DB_PG_PAGES_PER_TASK: {{ .Values.workNode.db.pgPagesPerTask | quote }}
+  DB_ALLOWED_DIRECTORIES: {{ .Values.workNode.db.settings.allowedDirectories | quote }}
+  DB_ALLOWED_PATHS: {{ .Values.workNode.db.settings.allowedPaths | quote }}
+  DB_ENABLE_LOGGING: {{ .Values.workNode.db.settings.enableLogging | quote }}
+  DB_MAX_MEMORY: {{ .Values.workNode.db.settings.maxMemory | quote }}
+  DB_MAX_TEMP_DIRECTORY_SIZE: {{ .Values.workNode.db.settings.maxTempDirectorySize | quote }}
+  DB_TEMP_DIRECTORY: {{ .Values.workNode.db.settings.tempDirectory | quote }}
+  DB_WORKER_THREADS: {{ .Values.workNode.db.settings.workerThreads | quote }}
+  DB_PG_CONNECTION_LIMIT: {{ .Values.workNode.db.settings.pgConnectionLimit | quote }}
+  DB_PG_PAGES_PER_TASK: {{ .Values.workNode.db.settings.pgPagesPerTask | quote }}
+  {{/* oidc settings */}}
+  OIDC_ISSUER: {{ .Values.workNode.oidc.issuer | quote }}
+  OIDC_CLIENT_ID: {{ .Values.workNode.oidc.clientID | quote }}
+  OIDC_TIMEOUT: {{ .Values.workNode.oidc.timeout | quote }}
+  OIDC_COOKIE_NAME: {{ .Values.workNode.oidc.cookieName | quote }}
+  OIDC_SCOPE_ROLE_PREFIX: {{ .Values.workNode.oidc.scopeRolePrefix | quote }}
+  OIDC_CLAIMS_USER_ID: {{ .Values.workNode.oidc.claims.userId | quote }}
+  OIDC_CLAIMS_USER_NAME: {{ .Values.workNode.oidc.claims.userName | quote }}
+  OIDC_CLAIMS_ROLE: {{ .Values.workNode.oidc.claims.role | quote }}
+  {{/* server settings */}}
+  DEBUG: {{ .Values.workNode.debug | quote }}
+  ADMIN_UI: {{ .Values.workNode.adminUI | quote }}
+  ADMIN_UI_FETCH_PATH: {{ .Values.workNode.adminFetchPath | quote }}
+  SECRET_KEY: {{ .Values.workNode.secretKey | quote }}
+  {{/* cors settings */}}
+  CORS_ALLOWED_ORIGINS: {{ .Values.workNode.cors.allowedOrigins | quote }}
+  CORS_ALLOWED_METHODS: {{ .Values.workNode.cors.allowedMethods | quote }}
+  CORS_ALLOWED_HEADERS: {{ .Values.workNode.cors.allowedHeaders | quote }}
+  {{/* auth settings */}}
+  ALLOW_MANAGED_API_KEYS: {{ .Values.workNode.auth.managedApiKeys | quote }}
+  ALLOWED_ANONYMOUS: {{ .Values.workNode.auth.allowedAnonymous | quote }}
+  ANONYMOUS_ROLE: {{ .Values.workNode.auth.anonymousRole | quote }}
+  AUTH_CONFIG_FILE: {{ .Values.workNode.auth.configFile | quote }}
+  {{/* cache settings */}}
   CACHE_TTL: {{ .Values.workNode.cache.ttl | quote }}
   CACHE_L1_ENABLED: {{ .Values.workNode.cache.l1.enabled | quote }}
   CACHE_L1_MAX_SIZE: {{ .Values.workNode.cache.l1.maxSize | quote }}

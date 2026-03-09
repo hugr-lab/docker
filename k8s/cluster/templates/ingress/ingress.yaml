@@ -18,4 +18,11 @@ spec:
               service:
                 name: work
                 port:
-                  number: {{ .Values.workNode.service.bind | trimPrefix ":" | int | default 15000 }}
+                  number: {{ include "cluster.bindPort" .Values.workNode.bind | int }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: management-node
+                port:
+                  number: {{ include "cluster.bindPort" .Values.management.bind | int }}

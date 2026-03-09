@@ -1,22 +1,40 @@
+coreDB:
+  path: ""
+  name: "hugr-core"
+  image:
+    repository: pgvector/pgvector
+    tag: pg16
+  auth:
+    username: "postgres"
+    password: "hugrPass"
+  port: 5432
+  storage: "1Gi"
+
 ingress:
   enabled: true
   host: "hugr-cluster.local"
 
 management:
   image:
-    repository: ghcr.io/hugr-lab/management
-    tag: v0.2.2
+    repository: ghcr.io/hugr-lab/automigrate
+    tag: v0.3.1
     pullPolicy: IfNotPresent
 
-  service:
-    bind: ":14000"
-    serviceBind: ":13000"
-  
+  bind: ":15000"
+  serviceBind: ":13000"
+
   cluster:
+    role: "management"
+    nodeName: "management"
     secret: "cluster-secret"
-    timeout: "30s"
-    checkInterval: "1m"
-  
+    heartbeat: "30s"
+    ghostTTL: "2m"
+
+  mcp:
+    enabled: false
+    embedderURL: ""
+    vectorSize: 768
+
   oidc:
     issuer: ""
     clientID: ""
@@ -27,44 +45,113 @@ management:
       userId: ""
       userName: ""
       role: ""
-  
-  workNode:
-    adminUI: true
-    adminFetchPath: "/query"
-    debug: true
-    coreDBName: "hugr-core"
-    coreDBPath: ""
-    cors:
-      allowedOrigins: ""
-      allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
-      allowedHeaders: "Authorization, Content-Type, Accept"
-    auth:
-      managedApiKeys: true
-      allowedAnonymous: true
-      anonymousRole: "admin"
-      configFile: ""
-    
+
+  allowParallel: true
+  maxParallelQueries: 0
+  maxDepthInTypes: 0
+
+  schemaCache:
+    maxEntries: 0
+    ttl: ""
+
+  db:
+    path: ""
+    homeDirectory: "/db-home"
+    maxOpenConns: 0
+    maxIdleConns: 0
+    settings:
+      allowedDirectories: ""
+      allowedPaths: ""
+      enableLogging: ""
+      maxMemory: ""
+      maxTempDirectorySize: ""
+      tempDirectory: ""
+      workerThreads: ""
+      pgConnectionLimit: 64
+      pgPagesPerTask: ""
+
+  dbHome:
+    mountPath: /db-home
+    storage: 1Gi
+    storageClass: "standard"
+
+  adminUI: true
+  adminFetchPath: "/query"
+  debug: false
+  secretKey: ""
+
+  cors:
+    allowedOrigins: ""
+    allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
+    allowedHeaders: "Authorization, Content-Type, Accept"
+
+  auth:
+    managedApiKeys: false
+    allowedAnonymous: true
+    anonymousRole: "admin"
+    configFile: ""
+
 workNode:
   image:
     repository: ghcr.io/hugr-lab/server
-    tag: v0.2.2
+    tag: v0.3.1
     pullPolicy: IfNotPresent
-  
+
   replicas: 3
+
+  bind: ":15000"
+  serviceBind: ":13000"
+
+  cluster:
+    role: "worker"
+    secret: "cluster-secret"
+    pollInterval: "30s"
+
+  mcp:
+    enabled: false
+    embedderURL: ""
+    vectorSize: 768
+
+  schemaCache:
+    maxEntries: 0
+    ttl: ""
+
+  adminUI: true
+  adminFetchPath: "/query"
+  debug: false
+  secretKey: ""
+
+  oidc:
+    issuer: ""
+    clientID: ""
+    timeout: ""
+    cookieName: ""
+    scopeRolePrefix: ""
+    claims:
+      userId: ""
+      userName: ""
+      role: ""
+
+  cors:
+    allowedOrigins: ""
+    allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
+    allowedHeaders: "Authorization, Content-Type, Accept"
+
+  auth:
+    managedApiKeys: false
+    allowedAnonymous: true
+    anonymousRole: "admin"
+    configFile: ""
 
   shared:
     size: "1Gi"
     mountPath: "/data"
     hostPath: "/data"
 
-  service:
-    bind: ":15000"
-    serviceBind: ":13000"
-
   allowParallel: true
   maxParallelQueries: 10
   maxDepthInTypes: 7
-  
+
   dbHome:
     mountPath: /db-home
     storage: 1Gi
@@ -72,6 +159,7 @@ workNode:
 
   db:
     path: ""
+    homeDirectory: "/db-home"
     maxOpenConns: 100
     maxIdleConns: 100
     settings:
@@ -89,8 +177,8 @@ workNode:
     ttl: "15m"
     l1:
       enabled: true
-      maxSize: 1000000
-      maxItemSize: 1000000
+      maxSize: 4096
+      maxItemSize: 1024
       shards: 4
       cleanTime: "1m"
       evictionTime: "5m"
@@ -102,8 +190,13 @@ workNode:
       username: ""
       password: ""
 
+redis:
+  image:
+    repository: redis
+    tag: 7-alpine
+
 postgresql:
-  enabled: true
+  bitnami: false
   fullnameOverride: "coredb"
   auth:
     postgresPassword: "hugrPass"
@@ -114,7 +207,7 @@ postgresql:
     enabled: true
 
 cache:
-  enabled: true
+  bitnami: false
   fullnameOverride: redis
   architecture: standalone
   auth:
@@ -124,7 +217,6 @@ cache:
       enabled: false
   redis:
     port: 6379
-  
 
 prometheus:
   enabled: false
