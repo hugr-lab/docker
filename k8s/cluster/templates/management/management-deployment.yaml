@@ -60,4 +60,5 @@ spec:
             periodSeconds: 30
       volumes:
         - name: db-home
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: management-db-home

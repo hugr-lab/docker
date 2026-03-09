@@ -67,8 +67,6 @@ spec:
                   fieldPath: metadata.name
             - name: CLUSTER_NODE_URL
               value: "http://$(CLUSTER_NODE_NAME).work-headless.{{ .Release.Namespace }}.svc.cluster.local:{{ include "cluster.bindPort" .Values.workNode.bind }}/ipc"
-            - name: CORE_DB_PATH
-              value: {{ include "cluster.CoreDB.DSN" . | quote }}
             - name: DB_HOME_DIRECTORY
               value: {{ .Values.workNode.dbHome.mountPath | default "/db-home" }}
           volumeMounts:

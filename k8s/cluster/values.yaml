@@ -1,3 +1,6 @@
+cluster:
+  secret: "cluster-secret"
+
 coreDB:
   path: ""
   name: "hugr-core"
@@ -27,7 +30,6 @@ management:
   cluster:
     role: "management"
     nodeName: "management"
-    secret: "cluster-secret"
     heartbeat: "30s"
     ghostTTL: "2m"
 
@@ -105,7 +107,6 @@ workNode:
 
   cluster:
     role: "worker"
-    secret: "cluster-secret"
     pollInterval: "30s"
 
   mcp:

@@ -13,7 +13,7 @@ data:
     CLUSTER_ROLE: {{ .Values.management.cluster.role | quote }}
     CLUSTER_NODE_NAME: {{ .Values.management.cluster.nodeName | quote }}
     CLUSTER_NODE_URL: "http://management-node:{{ include "cluster.bindPort" .Values.management.bind }}/ipc"
-    CLUSTER_SECRET: {{ .Values.management.cluster.secret | quote }}
+    CLUSTER_SECRET: {{ .Values.cluster.secret | quote }}
     CLUSTER_HEARTBEAT: {{ .Values.management.cluster.heartbeat | quote }}
     CLUSTER_GHOST_TTL: {{ .Values.management.cluster.ghostTTL | quote }}
     {{/* mcp settings */}}

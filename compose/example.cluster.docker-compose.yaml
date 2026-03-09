@@ -63,6 +63,8 @@ services:
     depends_on:
       core-db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       management:
         condition: service_healthy
     environment:
@@ -107,6 +109,8 @@ services:
     image: ghcr.io/hugr-lab/server:latest
     depends_on:
       core-db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       management:
         condition: service_healthy

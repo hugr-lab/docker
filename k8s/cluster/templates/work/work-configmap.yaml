@@ -11,7 +11,7 @@ data:
   {{/* cluster settings */}}
   CLUSTER_ENABLED: "true"
   CLUSTER_ROLE: {{ .Values.workNode.cluster.role | quote }}
-  CLUSTER_SECRET: {{ .Values.workNode.cluster.secret | quote }}
+  CLUSTER_SECRET: {{ .Values.cluster.secret | quote }}
   CLUSTER_POLL_INTERVAL: {{ .Values.workNode.cluster.pollInterval | quote }}
   {{/* mcp settings */}}
   MCP_ENABLED: {{ .Values.workNode.mcp.enabled | quote }}
@@ -73,5 +73,5 @@ data:
   CACHE_L2_BACKEND: {{ .Values.workNode.cache.l2.backend | quote }}
   CACHE_L2_ADDRESSES: {{ include "cluster.Cache.Addresses" . | quote }}
   CACHE_L2_DATABASE: {{ .Values.workNode.cache.l2.database | quote }}
-  CACHE_L2_USERNAME: {{ .Values.workNode.cache.l2.username | default .Values.cache.auth.username | quote }}
-  CACHE_L2_PASSWORD: {{ .Values.workNode.cache.l2.password | default .Values.cache.auth.password | quote }}
+  CACHE_L2_USERNAME: {{ .Values.workNode.cache.l2.username | quote }}
+  CACHE_L2_PASSWORD: {{ .Values.workNode.cache.l2.password | quote }}

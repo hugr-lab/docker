@@ -46,7 +46,7 @@ spec:
         name: data
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: standard
+        storageClassName: {{ .Values.coreDB.storageClass | default "standard" }}
         resources:
           requests:
             storage: {{ .Values.coreDB.storage | default "1Gi" }}

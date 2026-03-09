@@ -67,6 +67,8 @@ services:
     depends_on:
       core-db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       management:
         condition: service_healthy
     environment:
@@ -113,6 +115,8 @@ services:
       dockerfile: server.dockerfile
     depends_on:
       core-db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       management:
         condition: service_healthy
