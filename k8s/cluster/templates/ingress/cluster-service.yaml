@@ -1,0 +1,16 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hugr-cluster
+  labels:
+    app: hugr-cluster
+spec:
+  type: ClusterIP
+  selector:
+    hugr-cluster-node: "true"
+  ports:
+    - name: api
+      port: {{ include "cluster.bindPort" .Values.workNode.bind | int }}
+      targetPort: {{ include "cluster.bindPort" .Values.workNode.bind | int }}
+{{- end }}

@@ -132,7 +132,7 @@ Open http://localhost:15000/admin for the GraphQL playground.
 kubectl port-forward svc/work 15000:15000 -n hugr
 ```
 
-**Option C: Ingress (requires Traefik)**
+**Option C: Ingress**
 
 ```bash
 minikube addons enable ingress
@@ -140,6 +140,8 @@ echo "$(minikube ip) hugr-cluster.local" | sudo tee -a /etc/hosts
 ```
 
 Then access http://hugr-cluster.local (default ingress host).
+
+> **Note**: The chart defaults to `nginx` ingress class (standard for minikube). Override with `--set ingress.className=traefik` if using Traefik.
 
 ### 6. Test the Cluster
 

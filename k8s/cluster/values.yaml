@@ -12,6 +12,7 @@ coreDB:
 
 ingress:
   enabled: true
+  className: "nginx"
   host: "hugr-cluster.local"
 
 management:

@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app: management-node
+        hugr-cluster-node: "true"
       annotations:
         {{- if .Values.prometheus.enabled }}
         prometheus.io/scrape: "true"
