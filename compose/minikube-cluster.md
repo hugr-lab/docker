@@ -20,8 +20,8 @@ minikube addons enable ingress
 
 # 3. Build images inside minikube
 eval $(minikube docker-env)
-docker build -t ghcr.io/hugr-lab/server:v0.3.1 -f server.dockerfile .
-docker build -t ghcr.io/hugr-lab/automigrate:v0.3.1 -f automigrate.dockerfile .
+docker build -t ghcr.io/hugr-lab/server:v0.3.3 -f server.dockerfile .
+docker build -t ghcr.io/hugr-lab/automigrate:v0.3.3 -f automigrate.dockerfile .
 
 # 4. Install the chart
 helm install hugr ./k8s/cluster -n hugr --create-namespace \
@@ -45,8 +45,8 @@ kubectl port-forward svc/management-node 15000:15000 -n hugr
 |-----------|-------|-------|
 | CoreDB (PostgreSQL + pgvector) | `pgvector/pgvector:pg16` | Built-in template, no bitnami |
 | Redis | `redis:7-alpine` | Built-in template, no bitnami |
-| Management node | `ghcr.io/hugr-lab/automigrate:v0.3.1` | Runs migrations, then serves as full query node |
-| Worker node(s) | `ghcr.io/hugr-lab/server:v0.3.1` | Stateless query nodes |
+| Management node | `ghcr.io/hugr-lab/automigrate:v0.3.3` | Runs migrations, then serves as full query node |
+| Worker node(s) | `ghcr.io/hugr-lab/server:v0.3.3` | Stateless query nodes |
 
 The chart uses lightweight built-in PostgreSQL and Redis templates (not bitnami subcharts). CoreDB uses `pgvector/pgvector:pg16` which includes the vector extension required for migrations.
 
@@ -75,8 +75,8 @@ eval $(minikube docker-env)
 Build both images (from the repo root):
 
 ```bash
-docker build -t ghcr.io/hugr-lab/server:v0.3.1 -f server.dockerfile .
-docker build -t ghcr.io/hugr-lab/automigrate:v0.3.1 -f automigrate.dockerfile .
+docker build -t ghcr.io/hugr-lab/server:v0.3.3 -f server.dockerfile .
+docker build -t ghcr.io/hugr-lab/automigrate:v0.3.3 -f automigrate.dockerfile .
 ```
 
 > **Note**: The build takes a while — it compiles Go with CGO and DuckDB. Subsequent builds are faster due to Docker cache.

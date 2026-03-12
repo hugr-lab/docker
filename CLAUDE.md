@@ -35,7 +35,7 @@ docker build -t ghcr.io/hugr-lab/server:latest -f server.dockerfile .
 docker build -t ghcr.io/hugr-lab/automigrate:latest -f automigrate.dockerfile .
 
 # Build with specific hugr version
-docker build --build-arg HUGR_VERSION=v0.3.1 -t ghcr.io/hugr-lab/server:v0.3.1 -f server.dockerfile .
+docker build --build-arg HUGR_VERSION=v0.3.3 -t ghcr.io/hugr-lab/server:v0.3.3 -f server.dockerfile .
 
 # Build and run via compose
 cd compose && docker compose -f example.build.docker-compose.yaml up --build
