@@ -21,7 +21,7 @@ ingress:
 management:
   image:
     repository: ghcr.io/hugr-lab/automigrate
-    tag: v0.3.9
+    tag: v0.3.10
     pullPolicy: IfNotPresent
 
   bind: ":15000"
@@ -97,7 +97,7 @@ management:
 workNode:
   image:
     repository: ghcr.io/hugr-lab/server
-    tag: v0.3.9
+    tag: v0.3.10
     pullPolicy: IfNotPresent
 
   replicas: 3
