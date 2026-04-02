@@ -41,6 +41,7 @@ data:
     DB_WORKER_THREADS: {{ .Values.management.db.settings.workerThreads | quote }}
     DB_PG_CONNECTION_LIMIT: {{ .Values.management.db.settings.pgConnectionLimit | quote }}
     DB_PG_PAGES_PER_TASK: {{ .Values.management.db.settings.pgPagesPerTask | quote }}
+    DB_TIMEZONE: {{ .Values.management.db.timezone | default "" | quote }}
     {{/* oidc settings */}}
     OIDC_ISSUER: {{ .Values.management.oidc.issuer | quote }}
     OIDC_CLIENT_ID: {{ .Values.management.oidc.clientID | quote }}
@@ -50,6 +51,10 @@ data:
     OIDC_CLAIMS_USER_ID: {{ .Values.management.oidc.claims.userId | quote }}
     OIDC_CLAIMS_USER_NAME: {{ .Values.management.oidc.claims.userName | quote }}
     OIDC_CLAIMS_ROLE: {{ .Values.management.oidc.claims.role | quote }}
+    {{/* hugr-app heartbeat settings */}}
+    HUGR_APP_HEARTBEAT_INTERVAL: {{ .Values.management.hugrApp.heartbeatInterval | default "30s" | quote }}
+    HUGR_APP_HEARTBEAT_TIMEOUT: {{ .Values.management.hugrApp.heartbeatTimeout | default "10s" | quote }}
+    HUGR_APP_HEARTBEAT_RETRIES: {{ .Values.management.hugrApp.heartbeatRetries | default "3" | quote }}
     {{/* server settings */}}
     DEBUG: {{ .Values.management.debug | quote }}
     ADMIN_UI: {{ .Values.management.adminUI | quote }}

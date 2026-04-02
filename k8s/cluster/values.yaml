@@ -21,7 +21,7 @@ ingress:
 management:
   image:
     repository: ghcr.io/hugr-lab/automigrate
-    tag: v0.3.10
+    tag: v0.3.11
     pullPolicy: IfNotPresent
 
   bind: ":15000"
@@ -49,6 +49,11 @@ management:
       userName: ""
       role: ""
 
+  hugrApp:
+    heartbeatInterval: "30s"
+    heartbeatTimeout: "10s"
+    heartbeatRetries: "3"
+
   allowParallel: true
   maxParallelQueries: 0
   maxDepthInTypes: 0
@@ -60,6 +65,7 @@ management:
   db:
     path: ""
     homeDirectory: "/db-home"
+    timezone: ""  # IANA timezone (e.g., "Europe/Moscow"). Empty = system default (UTC)
     maxOpenConns: 0
     maxIdleConns: 0
     settings:
@@ -97,7 +103,7 @@ management:
 workNode:
   image:
     repository: ghcr.io/hugr-lab/server
-    tag: v0.3.10
+    tag: v0.3.11
     pullPolicy: IfNotPresent
 
   replicas: 3
@@ -150,6 +156,11 @@ workNode:
     mountPath: "/data"
     hostPath: "/data"
 
+  hugrApp:
+    heartbeatInterval: "30s"
+    heartbeatTimeout: "10s"
+    heartbeatRetries: "3"
+
   allowParallel: true
   maxParallelQueries: 10
   maxDepthInTypes: 7
@@ -162,6 +173,7 @@ workNode:
   db:
     path: ""
     homeDirectory: "/db-home"
+    timezone: ""  # IANA timezone (e.g., "Europe/Moscow"). Empty = system default (UTC)
     maxOpenConns: 100
     maxIdleConns: 100
     settings:
