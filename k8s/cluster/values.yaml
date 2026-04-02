@@ -100,6 +100,23 @@ management:
     anonymousRole: "admin"
     configFile: ""
 
+  cache:
+    ttl: ""
+    l1:
+      enabled: false
+      maxSize: 0
+      maxItemSize: 0
+      shards: 0
+      cleanTime: ""
+      evictionTime: ""
+    l2:
+      enabled: false
+      backend: ""
+      addresses: ""
+      database: 0
+      username: ""
+      password: ""
+
 workNode:
   image:
     repository: ghcr.io/hugr-lab/server

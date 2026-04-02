@@ -15,6 +15,8 @@ data:
   CLUSTER_POLL_INTERVAL: {{ .Values.workNode.cluster.pollInterval | quote }}
   {{/* mcp settings */}}
   MCP_ENABLED: {{ .Values.workNode.mcp.enabled | quote }}
+  MCP_OAUTH_CLIENT_ID: {{ .Values.workNode.mcp.oauthClientID | default "" | quote }}
+  MCP_OAUTH_CLIENT_SECRET: {{ .Values.workNode.mcp.oauthClientSecret | default "" | quote }}
   EMBEDDER_URL: {{ .Values.workNode.mcp.embedderURL | quote }}
   EMBEDDER_VECTOR_SIZE: {{ .Values.workNode.mcp.vectorSize | quote }}
   {{/* query settings */}}
@@ -42,18 +44,23 @@ data:
   {{/* oidc settings */}}
   OIDC_ISSUER: {{ .Values.workNode.oidc.issuer | quote }}
   OIDC_CLIENT_ID: {{ .Values.workNode.oidc.clientID | quote }}
+  OIDC_CLIENT_SECRET: {{ .Values.workNode.oidc.clientSecret | default "" | quote }}
   OIDC_TIMEOUT: {{ .Values.workNode.oidc.timeout | quote }}
+  OIDC_TLS_INSECURE: {{ .Values.workNode.oidc.tlsInsecure | default false | quote }}
   OIDC_COOKIE_NAME: {{ .Values.workNode.oidc.cookieName | quote }}
+  OIDC_SCOPES: {{ .Values.workNode.oidc.scopes | default "openid profile email" | quote }}
+  OIDC_REDIRECT_URL: {{ .Values.workNode.oidc.redirectURL | default "" | quote }}
   OIDC_SCOPE_ROLE_PREFIX: {{ .Values.workNode.oidc.scopeRolePrefix | quote }}
-  OIDC_CLAIMS_USER_ID: {{ .Values.workNode.oidc.claims.userId | quote }}
-  OIDC_CLAIMS_USER_NAME: {{ .Values.workNode.oidc.claims.userName | quote }}
-  OIDC_CLAIMS_ROLE: {{ .Values.workNode.oidc.claims.role | quote }}
+  OIDC_USERNAME_CLAIM: {{ .Values.workNode.oidc.claims.userName | quote }}
+  OIDC_USERID_CLAIM: {{ .Values.workNode.oidc.claims.userId | quote }}
+  OIDC_ROLE_CLAIM: {{ .Values.workNode.oidc.claims.role | quote }}
   {{/* hugr-app heartbeat settings */}}
   HUGR_APP_HEARTBEAT_INTERVAL: {{ .Values.workNode.hugrApp.heartbeatInterval | default "30s" | quote }}
   HUGR_APP_HEARTBEAT_TIMEOUT: {{ .Values.workNode.hugrApp.heartbeatTimeout | default "10s" | quote }}
   HUGR_APP_HEARTBEAT_RETRIES: {{ .Values.workNode.hugrApp.heartbeatRetries | default "3" | quote }}
   {{/* server settings */}}
   DEBUG: {{ .Values.workNode.debug | quote }}
+  HTTP_PROFILING: {{ .Values.workNode.httpProfiling | default false | quote }}
   ADMIN_UI: {{ .Values.workNode.adminUI | quote }}
   ADMIN_UI_FETCH_PATH: {{ .Values.workNode.adminFetchPath | quote }}
   SECRET_KEY: {{ .Values.workNode.secretKey | quote }}

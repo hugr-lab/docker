@@ -18,6 +18,8 @@ data:
     CLUSTER_GHOST_TTL: {{ .Values.management.cluster.ghostTTL | quote }}
     {{/* mcp settings */}}
     MCP_ENABLED: {{ .Values.management.mcp.enabled | quote }}
+    MCP_OAUTH_CLIENT_ID: {{ .Values.management.mcp.oauthClientID | default "" | quote }}
+    MCP_OAUTH_CLIENT_SECRET: {{ .Values.management.mcp.oauthClientSecret | default "" | quote }}
     EMBEDDER_URL: {{ .Values.management.mcp.embedderURL | quote }}
     EMBEDDER_VECTOR_SIZE: {{ .Values.management.mcp.vectorSize | quote }}
     {{/* query settings */}}
@@ -45,18 +47,23 @@ data:
     {{/* oidc settings */}}
     OIDC_ISSUER: {{ .Values.management.oidc.issuer | quote }}
     OIDC_CLIENT_ID: {{ .Values.management.oidc.clientID | quote }}
+    OIDC_CLIENT_SECRET: {{ .Values.management.oidc.clientSecret | default "" | quote }}
     OIDC_TIMEOUT: {{ .Values.management.oidc.timeout | quote }}
+    OIDC_TLS_INSECURE: {{ .Values.management.oidc.tlsInsecure | default false | quote }}
     OIDC_COOKIE_NAME: {{ .Values.management.oidc.cookieName | quote }}
+    OIDC_SCOPES: {{ .Values.management.oidc.scopes | default "openid profile email" | quote }}
+    OIDC_REDIRECT_URL: {{ .Values.management.oidc.redirectURL | default "" | quote }}
     OIDC_SCOPE_ROLE_PREFIX: {{ .Values.management.oidc.scopeRolePrefix | quote }}
-    OIDC_CLAIMS_USER_ID: {{ .Values.management.oidc.claims.userId | quote }}
-    OIDC_CLAIMS_USER_NAME: {{ .Values.management.oidc.claims.userName | quote }}
-    OIDC_CLAIMS_ROLE: {{ .Values.management.oidc.claims.role | quote }}
+    OIDC_USERNAME_CLAIM: {{ .Values.management.oidc.claims.userName | quote }}
+    OIDC_USERID_CLAIM: {{ .Values.management.oidc.claims.userId | quote }}
+    OIDC_ROLE_CLAIM: {{ .Values.management.oidc.claims.role | quote }}
     {{/* hugr-app heartbeat settings */}}
     HUGR_APP_HEARTBEAT_INTERVAL: {{ .Values.management.hugrApp.heartbeatInterval | default "30s" | quote }}
     HUGR_APP_HEARTBEAT_TIMEOUT: {{ .Values.management.hugrApp.heartbeatTimeout | default "10s" | quote }}
     HUGR_APP_HEARTBEAT_RETRIES: {{ .Values.management.hugrApp.heartbeatRetries | default "3" | quote }}
     {{/* server settings */}}
     DEBUG: {{ .Values.management.debug | quote }}
+    HTTP_PROFILING: {{ .Values.management.httpProfiling | default false | quote }}
     ADMIN_UI: {{ .Values.management.adminUI | quote }}
     ADMIN_UI_FETCH_PATH: {{ .Values.management.adminFetchPath | quote }}
     SECRET_KEY: {{ .Values.management.secretKey | quote }}
@@ -69,3 +76,17 @@ data:
     ALLOWED_ANONYMOUS: {{ .Values.management.auth.allowedAnonymous | quote }}
     ANONYMOUS_ROLE: {{ .Values.management.auth.anonymousRole | quote }}
     AUTH_CONFIG_FILE: {{ .Values.management.auth.configFile | quote }}
+    {{/* cache settings */}}
+    CACHE_TTL: {{ .Values.management.cache.ttl | default "" | quote }}
+    CACHE_L1_ENABLED: {{ .Values.management.cache.l1.enabled | default false | quote }}
+    CACHE_L1_MAX_SIZE: {{ .Values.management.cache.l1.maxSize | default 0 | quote }}
+    CACHE_L1_MAX_ITEM_SIZE: {{ .Values.management.cache.l1.maxItemSize | default 0 | quote }}
+    CACHE_L1_SHARDS: {{ .Values.management.cache.l1.shards | default 0 | quote }}
+    CACHE_L1_CLEAN_TIME: {{ .Values.management.cache.l1.cleanTime | default "" | quote }}
+    CACHE_L1_EVICTION_TIME: {{ .Values.management.cache.l1.evictionTime | default "" | quote }}
+    CACHE_L2_ENABLED: {{ .Values.management.cache.l2.enabled | default false | quote }}
+    CACHE_L2_BACKEND: {{ .Values.management.cache.l2.backend | default "" | quote }}
+    CACHE_L2_ADDRESSES: {{ .Values.management.cache.l2.addresses | default "" | quote }}
+    CACHE_L2_DATABASE: {{ .Values.management.cache.l2.database | default 0 | quote }}
+    CACHE_L2_USERNAME: {{ .Values.management.cache.l2.username | default "" | quote }}
+    CACHE_L2_PASSWORD: {{ .Values.management.cache.l2.password | default "" | quote }}
