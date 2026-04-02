@@ -46,7 +46,7 @@ USER root
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates curl && \
+    apt-get install -y --no-install-recommends ca-certificates curl tzdata && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf \
