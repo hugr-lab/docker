@@ -18,31 +18,30 @@ ingress:
   className: "nginx"
   host: "hugr-cluster.local"
 
-management:
-  image:
-    repository: ghcr.io/hugr-lab/automigrate
-    tag: v0.3.11
-    pullPolicy: IfNotPresent
-
+# Shared defaults for all nodes. Management and workNode sections
+# can override any value; ConfigMap templates use
+# `.Values.management.<key>` / `.Values.workNode.<key>` with
+# `| default .Values.defaults.<key>` fallback where needed.
+defaults:
   bind: ":15000"
   serviceBind: ":13000"
 
-  cluster:
-    role: "management"
-    nodeName: "management"
-    heartbeat: "30s"
-    ghostTTL: "2m"
-
   mcp:
     enabled: false
+    oauthClientID: ""
+    oauthClientSecret: ""
     embedderURL: ""
     vectorSize: 768
 
   oidc:
     issuer: ""
     clientID: ""
+    clientSecret: ""
     timeout: ""
+    tlsInsecure: false
     cookieName: ""
+    scopes: "openid profile email"
+    redirectURL: ""
     scopeRolePrefix: ""
     claims:
       userId: ""
@@ -87,6 +86,7 @@ management:
   adminUI: true
   adminFetchPath: "/query"
   debug: false
+  httpProfiling: false
   secretKey: ""
 
   cors:
@@ -117,6 +117,20 @@ management:
       username: ""
       password: ""
 
+# Management node — overrides only what differs from defaults
+management:
+  image:
+    repository: ghcr.io/hugr-lab/automigrate
+    tag: v0.3.11
+    pullPolicy: IfNotPresent
+
+  cluster:
+    role: "management"
+    nodeName: "management"
+    heartbeat: "30s"
+    ghostTTL: "2m"
+
+# Worker nodes — overrides only what differs from defaults
 workNode:
   image:
     repository: ghcr.io/hugr-lab/server
@@ -125,84 +139,22 @@ workNode:
 
   replicas: 3
 
-  bind: ":15000"
-  serviceBind: ":13000"
-
   cluster:
     role: "worker"
     pollInterval: "30s"
 
-  mcp:
-    enabled: false
-    embedderURL: ""
-    vectorSize: 768
+  # Workers typically have higher limits and caching enabled
+  maxParallelQueries: 10
+  maxDepthInTypes: 7
 
-  schemaCache:
-    maxEntries: 0
-    ttl: ""
-
-  adminUI: true
-  adminFetchPath: "/query"
-  debug: false
-  secretKey: ""
-
-  oidc:
-    issuer: ""
-    clientID: ""
-    timeout: ""
-    cookieName: ""
-    scopeRolePrefix: ""
-    claims:
-      userId: ""
-      userName: ""
-      role: ""
-
-  cors:
-    allowedOrigins: ""
-    allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
-    allowedHeaders: "Authorization, Content-Type, Accept"
-
-  auth:
-    managedApiKeys: false
-    allowedAnonymous: true
-    anonymousRole: "admin"
-    configFile: ""
+  db:
+    maxOpenConns: 100
+    maxIdleConns: 100
 
   shared:
     size: "1Gi"
     mountPath: "/data"
     hostPath: "/data"
-
-  hugrApp:
-    heartbeatInterval: "30s"
-    heartbeatTimeout: "10s"
-    heartbeatRetries: "3"
-
-  allowParallel: true
-  maxParallelQueries: 10
-  maxDepthInTypes: 7
-
-  dbHome:
-    mountPath: /db-home
-    storage: 1Gi
-    storageClass: "standard"
-
-  db:
-    path: ""
-    homeDirectory: "/db-home"
-    timezone: ""  # IANA timezone (e.g., "Europe/Moscow"). Empty = system default (UTC)
-    maxOpenConns: 100
-    maxIdleConns: 100
-    settings:
-      allowedDirectories: ""
-      allowedPaths: ""
-      enableLogging: ""
-      maxMemory: ""
-      maxTempDirectorySize: ""
-      tempDirectory: ""
-      workerThreads: ""
-      pgConnectionLimit: 64
-      pgPagesPerTask: ""
 
   cache:
     ttl: "15m"

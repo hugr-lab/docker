@@ -1,3 +1,5 @@
+{{- $d := .Values.defaults }}
+{{- $m := .Values.management }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -5,88 +7,88 @@ metadata:
   labels:
     app: management
 data:
-    BIND: {{ .Values.management.bind | quote }}
-    SERVICE_BIND: {{ .Values.management.serviceBind | quote }}
+    BIND: {{ $m.bind | default $d.bind | quote }}
+    SERVICE_BIND: {{ $m.serviceBind | default $d.serviceBind | quote }}
     CORE_DB_PATH: {{ include "cluster.CoreDB.DSN" . | quote }}
     {{/* cluster settings */}}
     CLUSTER_ENABLED: "true"
-    CLUSTER_ROLE: {{ .Values.management.cluster.role | quote }}
-    CLUSTER_NODE_NAME: {{ .Values.management.cluster.nodeName | quote }}
-    CLUSTER_NODE_URL: "http://management-node:{{ include "cluster.bindPort" .Values.management.bind }}/ipc"
+    CLUSTER_ROLE: {{ $m.cluster.role | quote }}
+    CLUSTER_NODE_NAME: {{ $m.cluster.nodeName | quote }}
+    CLUSTER_NODE_URL: "http://management-node:{{ include "cluster.bindPort" ($m.bind | default $d.bind) }}/ipc"
     CLUSTER_SECRET: {{ .Values.cluster.secret | quote }}
-    CLUSTER_HEARTBEAT: {{ .Values.management.cluster.heartbeat | quote }}
-    CLUSTER_GHOST_TTL: {{ .Values.management.cluster.ghostTTL | quote }}
+    CLUSTER_HEARTBEAT: {{ $m.cluster.heartbeat | quote }}
+    CLUSTER_GHOST_TTL: {{ $m.cluster.ghostTTL | quote }}
     {{/* mcp settings */}}
-    MCP_ENABLED: {{ .Values.management.mcp.enabled | quote }}
-    MCP_OAUTH_CLIENT_ID: {{ .Values.management.mcp.oauthClientID | default "" | quote }}
-    MCP_OAUTH_CLIENT_SECRET: {{ .Values.management.mcp.oauthClientSecret | default "" | quote }}
-    EMBEDDER_URL: {{ .Values.management.mcp.embedderURL | quote }}
-    EMBEDDER_VECTOR_SIZE: {{ .Values.management.mcp.vectorSize | quote }}
+    MCP_ENABLED: {{ ($m.mcp).enabled | default $d.mcp.enabled | quote }}
+    MCP_OAUTH_CLIENT_ID: {{ ($m.mcp).oauthClientID | default $d.mcp.oauthClientID | quote }}
+    MCP_OAUTH_CLIENT_SECRET: {{ ($m.mcp).oauthClientSecret | default $d.mcp.oauthClientSecret | quote }}
+    EMBEDDER_URL: {{ ($m.mcp).embedderURL | default $d.mcp.embedderURL | quote }}
+    EMBEDDER_VECTOR_SIZE: {{ ($m.mcp).vectorSize | default $d.mcp.vectorSize | quote }}
     {{/* query settings */}}
-    ALLOW_PARALLEL: {{ .Values.management.allowParallel | quote }}
-    MAX_PARALLEL_QUERIES: {{ .Values.management.maxParallelQueries | quote }}
-    MAX_DEPTH: {{ .Values.management.maxDepthInTypes | quote }}
+    ALLOW_PARALLEL: {{ $m.allowParallel | default $d.allowParallel | quote }}
+    MAX_PARALLEL_QUERIES: {{ $m.maxParallelQueries | default $d.maxParallelQueries | quote }}
+    MAX_DEPTH: {{ $m.maxDepthInTypes | default $d.maxDepthInTypes | quote }}
     {{/* schema cache settings */}}
-    SCHEMA_CACHE_MAX_ENTRIES: {{ .Values.management.schemaCache.maxEntries | quote }}
-    SCHEMA_CACHE_TTL: {{ .Values.management.schemaCache.ttl | quote }}
+    SCHEMA_CACHE_MAX_ENTRIES: {{ ($m.schemaCache).maxEntries | default $d.schemaCache.maxEntries | quote }}
+    SCHEMA_CACHE_TTL: {{ ($m.schemaCache).ttl | default $d.schemaCache.ttl | quote }}
     {{/* db settings */}}
-    DB_PATH: {{ .Values.management.db.path | quote }}
-    DB_HOME_DIRECTORY: {{ .Values.management.db.homeDirectory | quote }}
-    DB_MAX_OPEN_CONNS: {{ .Values.management.db.maxOpenConns | quote }}
-    DB_MAX_IDLE_CONNS: {{ .Values.management.db.maxIdleConns | quote }}
-    DB_ALLOWED_DIRECTORIES: {{ .Values.management.db.settings.allowedDirectories | quote }}
-    DB_ALLOWED_PATHS: {{ .Values.management.db.settings.allowedPaths | quote }}
-    DB_ENABLE_LOGGING: {{ .Values.management.db.settings.enableLogging | quote }}
-    DB_MAX_MEMORY: {{ .Values.management.db.settings.maxMemory | quote }}
-    DB_MAX_TEMP_DIRECTORY_SIZE: {{ .Values.management.db.settings.maxTempDirectorySize | quote }}
-    DB_TEMP_DIRECTORY: {{ .Values.management.db.settings.tempDirectory | quote }}
-    DB_WORKER_THREADS: {{ .Values.management.db.settings.workerThreads | quote }}
-    DB_PG_CONNECTION_LIMIT: {{ .Values.management.db.settings.pgConnectionLimit | quote }}
-    DB_PG_PAGES_PER_TASK: {{ .Values.management.db.settings.pgPagesPerTask | quote }}
-    DB_TIMEZONE: {{ .Values.management.db.timezone | default "" | quote }}
+    DB_PATH: {{ ($m.db).path | default $d.db.path | quote }}
+    DB_HOME_DIRECTORY: {{ ($m.db).homeDirectory | default $d.db.homeDirectory | quote }}
+    DB_MAX_OPEN_CONNS: {{ ($m.db).maxOpenConns | default $d.db.maxOpenConns | quote }}
+    DB_MAX_IDLE_CONNS: {{ ($m.db).maxIdleConns | default $d.db.maxIdleConns | quote }}
+    DB_ALLOWED_DIRECTORIES: {{ (($m.db).settings).allowedDirectories | default $d.db.settings.allowedDirectories | quote }}
+    DB_ALLOWED_PATHS: {{ (($m.db).settings).allowedPaths | default $d.db.settings.allowedPaths | quote }}
+    DB_ENABLE_LOGGING: {{ (($m.db).settings).enableLogging | default $d.db.settings.enableLogging | quote }}
+    DB_MAX_MEMORY: {{ (($m.db).settings).maxMemory | default $d.db.settings.maxMemory | quote }}
+    DB_MAX_TEMP_DIRECTORY_SIZE: {{ (($m.db).settings).maxTempDirectorySize | default $d.db.settings.maxTempDirectorySize | quote }}
+    DB_TEMP_DIRECTORY: {{ (($m.db).settings).tempDirectory | default $d.db.settings.tempDirectory | quote }}
+    DB_WORKER_THREADS: {{ (($m.db).settings).workerThreads | default $d.db.settings.workerThreads | quote }}
+    DB_PG_CONNECTION_LIMIT: {{ (($m.db).settings).pgConnectionLimit | default $d.db.settings.pgConnectionLimit | quote }}
+    DB_PG_PAGES_PER_TASK: {{ (($m.db).settings).pgPagesPerTask | default $d.db.settings.pgPagesPerTask | quote }}
+    DB_TIMEZONE: {{ ($m.db).timezone | default $d.db.timezone | quote }}
     {{/* oidc settings */}}
-    OIDC_ISSUER: {{ .Values.management.oidc.issuer | quote }}
-    OIDC_CLIENT_ID: {{ .Values.management.oidc.clientID | quote }}
-    OIDC_CLIENT_SECRET: {{ .Values.management.oidc.clientSecret | default "" | quote }}
-    OIDC_TIMEOUT: {{ .Values.management.oidc.timeout | quote }}
-    OIDC_TLS_INSECURE: {{ .Values.management.oidc.tlsInsecure | default false | quote }}
-    OIDC_COOKIE_NAME: {{ .Values.management.oidc.cookieName | quote }}
-    OIDC_SCOPES: {{ .Values.management.oidc.scopes | default "openid profile email" | quote }}
-    OIDC_REDIRECT_URL: {{ .Values.management.oidc.redirectURL | default "" | quote }}
-    OIDC_SCOPE_ROLE_PREFIX: {{ .Values.management.oidc.scopeRolePrefix | quote }}
-    OIDC_USERNAME_CLAIM: {{ .Values.management.oidc.claims.userName | quote }}
-    OIDC_USERID_CLAIM: {{ .Values.management.oidc.claims.userId | quote }}
-    OIDC_ROLE_CLAIM: {{ .Values.management.oidc.claims.role | quote }}
+    OIDC_ISSUER: {{ ($m.oidc).issuer | default $d.oidc.issuer | quote }}
+    OIDC_CLIENT_ID: {{ ($m.oidc).clientID | default $d.oidc.clientID | quote }}
+    OIDC_CLIENT_SECRET: {{ ($m.oidc).clientSecret | default $d.oidc.clientSecret | quote }}
+    OIDC_TIMEOUT: {{ ($m.oidc).timeout | default $d.oidc.timeout | quote }}
+    OIDC_TLS_INSECURE: {{ ($m.oidc).tlsInsecure | default $d.oidc.tlsInsecure | quote }}
+    OIDC_COOKIE_NAME: {{ ($m.oidc).cookieName | default $d.oidc.cookieName | quote }}
+    OIDC_SCOPES: {{ ($m.oidc).scopes | default $d.oidc.scopes | quote }}
+    OIDC_REDIRECT_URL: {{ ($m.oidc).redirectURL | default $d.oidc.redirectURL | quote }}
+    OIDC_SCOPE_ROLE_PREFIX: {{ ($m.oidc).scopeRolePrefix | default $d.oidc.scopeRolePrefix | quote }}
+    OIDC_USERNAME_CLAIM: {{ (($m.oidc).claims).userName | default $d.oidc.claims.userName | quote }}
+    OIDC_USERID_CLAIM: {{ (($m.oidc).claims).userId | default $d.oidc.claims.userId | quote }}
+    OIDC_ROLE_CLAIM: {{ (($m.oidc).claims).role | default $d.oidc.claims.role | quote }}
     {{/* hugr-app heartbeat settings */}}
-    HUGR_APP_HEARTBEAT_INTERVAL: {{ .Values.management.hugrApp.heartbeatInterval | default "30s" | quote }}
-    HUGR_APP_HEARTBEAT_TIMEOUT: {{ .Values.management.hugrApp.heartbeatTimeout | default "10s" | quote }}
-    HUGR_APP_HEARTBEAT_RETRIES: {{ .Values.management.hugrApp.heartbeatRetries | default "3" | quote }}
+    HUGR_APP_HEARTBEAT_INTERVAL: {{ ($m.hugrApp).heartbeatInterval | default $d.hugrApp.heartbeatInterval | quote }}
+    HUGR_APP_HEARTBEAT_TIMEOUT: {{ ($m.hugrApp).heartbeatTimeout | default $d.hugrApp.heartbeatTimeout | quote }}
+    HUGR_APP_HEARTBEAT_RETRIES: {{ ($m.hugrApp).heartbeatRetries | default $d.hugrApp.heartbeatRetries | quote }}
     {{/* server settings */}}
-    DEBUG: {{ .Values.management.debug | quote }}
-    HTTP_PROFILING: {{ .Values.management.httpProfiling | default false | quote }}
-    ADMIN_UI: {{ .Values.management.adminUI | quote }}
-    ADMIN_UI_FETCH_PATH: {{ .Values.management.adminFetchPath | quote }}
-    SECRET_KEY: {{ .Values.management.secretKey | quote }}
+    DEBUG: {{ $m.debug | default $d.debug | quote }}
+    HTTP_PROFILING: {{ $m.httpProfiling | default $d.httpProfiling | quote }}
+    ADMIN_UI: {{ $m.adminUI | default $d.adminUI | quote }}
+    ADMIN_UI_FETCH_PATH: {{ $m.adminFetchPath | default $d.adminFetchPath | quote }}
+    SECRET_KEY: {{ $m.secretKey | default $d.secretKey | quote }}
     {{/* cors settings */}}
-    CORS_ALLOWED_ORIGINS: {{ .Values.management.cors.allowedOrigins | quote }}
-    CORS_ALLOWED_METHODS: {{ .Values.management.cors.allowedMethods | quote }}
-    CORS_ALLOWED_HEADERS: {{ .Values.management.cors.allowedHeaders | quote }}
+    CORS_ALLOWED_ORIGINS: {{ ($m.cors).allowedOrigins | default $d.cors.allowedOrigins | quote }}
+    CORS_ALLOWED_METHODS: {{ ($m.cors).allowedMethods | default $d.cors.allowedMethods | quote }}
+    CORS_ALLOWED_HEADERS: {{ ($m.cors).allowedHeaders | default $d.cors.allowedHeaders | quote }}
     {{/* auth settings */}}
-    ALLOW_MANAGED_API_KEYS: {{ .Values.management.auth.managedApiKeys | quote }}
-    ALLOWED_ANONYMOUS: {{ .Values.management.auth.allowedAnonymous | quote }}
-    ANONYMOUS_ROLE: {{ .Values.management.auth.anonymousRole | quote }}
-    AUTH_CONFIG_FILE: {{ .Values.management.auth.configFile | quote }}
+    ALLOW_MANAGED_API_KEYS: {{ ($m.auth).managedApiKeys | default $d.auth.managedApiKeys | quote }}
+    ALLOWED_ANONYMOUS: {{ ($m.auth).allowedAnonymous | default $d.auth.allowedAnonymous | quote }}
+    ANONYMOUS_ROLE: {{ ($m.auth).anonymousRole | default $d.auth.anonymousRole | quote }}
+    AUTH_CONFIG_FILE: {{ ($m.auth).configFile | default $d.auth.configFile | quote }}
     {{/* cache settings */}}
-    CACHE_TTL: {{ .Values.management.cache.ttl | default "" | quote }}
-    CACHE_L1_ENABLED: {{ .Values.management.cache.l1.enabled | default false | quote }}
-    CACHE_L1_MAX_SIZE: {{ .Values.management.cache.l1.maxSize | default 0 | quote }}
-    CACHE_L1_MAX_ITEM_SIZE: {{ .Values.management.cache.l1.maxItemSize | default 0 | quote }}
-    CACHE_L1_SHARDS: {{ .Values.management.cache.l1.shards | default 0 | quote }}
-    CACHE_L1_CLEAN_TIME: {{ .Values.management.cache.l1.cleanTime | default "" | quote }}
-    CACHE_L1_EVICTION_TIME: {{ .Values.management.cache.l1.evictionTime | default "" | quote }}
-    CACHE_L2_ENABLED: {{ .Values.management.cache.l2.enabled | default false | quote }}
-    CACHE_L2_BACKEND: {{ .Values.management.cache.l2.backend | default "" | quote }}
-    CACHE_L2_ADDRESSES: {{ .Values.management.cache.l2.addresses | default "" | quote }}
-    CACHE_L2_DATABASE: {{ .Values.management.cache.l2.database | default 0 | quote }}
-    CACHE_L2_USERNAME: {{ .Values.management.cache.l2.username | default "" | quote }}
-    CACHE_L2_PASSWORD: {{ .Values.management.cache.l2.password | default "" | quote }}
+    CACHE_TTL: {{ ($m.cache).ttl | default $d.cache.ttl | quote }}
+    CACHE_L1_ENABLED: {{ (($m.cache).l1).enabled | default $d.cache.l1.enabled | quote }}
+    CACHE_L1_MAX_SIZE: {{ (($m.cache).l1).maxSize | default $d.cache.l1.maxSize | quote }}
+    CACHE_L1_MAX_ITEM_SIZE: {{ (($m.cache).l1).maxItemSize | default $d.cache.l1.maxItemSize | quote }}
+    CACHE_L1_SHARDS: {{ (($m.cache).l1).shards | default $d.cache.l1.shards | quote }}
+    CACHE_L1_CLEAN_TIME: {{ (($m.cache).l1).cleanTime | default $d.cache.l1.cleanTime | quote }}
+    CACHE_L1_EVICTION_TIME: {{ (($m.cache).l1).evictionTime | default $d.cache.l1.evictionTime | quote }}
+    CACHE_L2_ENABLED: {{ (($m.cache).l2).enabled | default $d.cache.l2.enabled | quote }}
+    CACHE_L2_BACKEND: {{ (($m.cache).l2).backend | default $d.cache.l2.backend | quote }}
+    CACHE_L2_ADDRESSES: {{ include "cluster.Cache.Addresses" . | quote }}
+    CACHE_L2_DATABASE: {{ (($m.cache).l2).database | default $d.cache.l2.database | quote }}
+    CACHE_L2_USERNAME: {{ (($m.cache).l2).username | default $d.cache.l2.username | quote }}
+    CACHE_L2_PASSWORD: {{ (($m.cache).l2).password | default $d.cache.l2.password | quote }}
