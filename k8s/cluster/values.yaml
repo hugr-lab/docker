@@ -121,7 +121,7 @@ defaults:
 management:
   image:
     repository: ghcr.io/hugr-lab/automigrate
-    tag: v0.3.19
+    tag: v0.3.20
     pullPolicy: IfNotPresent
 
   cluster:
@@ -134,7 +134,7 @@ management:
 workNode:
   image:
     repository: ghcr.io/hugr-lab/server
-    tag: v0.3.19
+    tag: v0.3.20
     pullPolicy: IfNotPresent
 
   replicas: 3
