@@ -3,7 +3,7 @@ name: hugr-cluster
 description: Helm chart to deploy the hugr DataMesh cluster with management-node
 type: application
 version: 0.1.0
-appVersion: "v0.3.10"
+appVersion: "v0.3.31"
 
 dependencies:
   - name: postgresql
